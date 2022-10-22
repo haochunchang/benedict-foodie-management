@@ -13,7 +13,7 @@ type Food struct {
 	Description     string
 }
 
-// A Record has one food
+// A Record belongs to a food
 type Record struct {
 	gorm.Model
 	FoodID            uint
