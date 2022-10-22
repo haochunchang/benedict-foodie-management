@@ -39,7 +39,8 @@ Optional
     - A photo to show the content
 - Use cases:
     1. I can click the calendar box and pop up a form to fill in today's food name, description, score and upload photo.
-    2. I can create food through another button to add my current stocking of food.
+    2. When submit a record with eaten quantity, the database should update the curent stocking of food.
+    3. I can create food through another button to add my current stocking of food.
 
 ---
 - Evolving data model and interfaces
