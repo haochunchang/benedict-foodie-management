@@ -1,0 +1,188 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders FoodForm correctly 1`] = `
+<View>
+  <Text>
+    Creat Food Stock
+  </Text>
+  <Text>
+    Food name
+  </Text>
+  <TextInput
+    autoFocus={true}
+    onChangeText={[Function]}
+    placeholder="Enter the food name"
+    value=""
+  />
+  <Text>
+    Food type
+  </Text>
+  <View
+    style={
+      Array [
+        Object {
+          "alignSelf": "stretch",
+        },
+        Object {
+          "paddingBottom": 0,
+          "zIndex": 999,
+        },
+      ]
+    }
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "alignSelf": "stretch",
+            "backgroundColor": "#efefef",
+            "borderRadius": 2,
+            "flexDirection": "row",
+            "height": 40,
+            "justifyContent": "space-between",
+          },
+          undefined,
+          Object {
+            "paddingHorizontal": 10,
+          },
+        ]
+      }
+    >
+      <Text
+        lineBreakMode="tail"
+        numberOfLines={1}
+        style={
+          Array [
+            undefined,
+            Object {
+              "width": 202,
+            },
+          ]
+        }
+      >
+        Dry Food
+      </Text>
+    </View>
+  </View>
+  <Text>
+    Purchase Date
+  </Text>
+  <TextInput
+    keyboardType="numeric"
+    onChangeText={[Function]}
+    placeholder="Enter the purchase date in YYYY-MM-DD format"
+    value={null}
+  />
+  <Text>
+    Food quantity
+  </Text>
+  <TextInput
+    keyboardType="phone-pad"
+    onChangeText={[Function]}
+    placeholder="Enter the number of bags or cans"
+    value={0}
+  />
+  <Text>
+    Food description
+  </Text>
+  <TextInput
+    onChangeText={[Function]}
+    placeholder="What's about the food?"
+    value=""
+  />
+  <View
+    accessibilityRole="button"
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Object {
+        "opacity": 1,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {},
+        ]
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#007AFF",
+              "fontSize": 18,
+              "margin": 8,
+              "textAlign": "center",
+            },
+          ]
+        }
+      >
+        Submit
+      </Text>
+    </View>
+  </View>
+  <View
+    accessibilityRole="button"
+    accessible={true}
+    collapsable={false}
+    focusable={false}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Object {
+        "opacity": 1,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {},
+        ]
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#007AFF",
+              "fontSize": 18,
+              "margin": 8,
+              "textAlign": "center",
+            },
+          ]
+        }
+      >
+        Cancel
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`renders RecordForm correctly 1`] = `null`;
