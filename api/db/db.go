@@ -29,6 +29,10 @@ type FoodRepositoryPSQL struct {
 	db *gorm.DB
 }
 
+func NewFoodRepositoryPSQL(conn *gorm.DB) *FoodRepositoryPSQL {
+	return &FoodRepositoryPSQL{conn}
+}
+
 func (f *FoodRepositoryPSQL) Init() {
 	f.db.AutoMigrate(&Food{})
 }
@@ -60,6 +64,10 @@ type RecordRepository interface {
 
 type RecordRepositoryPSQL struct {
 	db *gorm.DB
+}
+
+func NewRecordRepositoryPSQL(conn *gorm.DB) *RecordRepositoryPSQL {
+	return &RecordRepositoryPSQL{conn}
 }
 
 func (rr *RecordRepositoryPSQL) Init() {
