@@ -17,10 +17,14 @@ func GetDB(connectionInfo string) *gorm.DB {
 	return db
 }
 
-// FoodRepoistory stores the food information
-type FoodRepository interface {
+type Repository interface {
 	Init()
 	Clear()
+}
+
+// FoodRepoistory stores the food information
+type FoodRepository interface {
+	Repository
 	CreateFood(food Food) error
 	GetFoodByName(name string) Food
 }
@@ -56,8 +60,7 @@ func (f *FoodRepositoryPSQL) GetFoodByName(name string) Food {
 
 // RecordRepoistory stores the food record data
 type RecordRepository interface {
-	Init()
-	Clear()
+	Repository
 	CreateRecord(r Record) error
 	GetRecordsByDate(eatingDate string) ([]Record, error)
 }
