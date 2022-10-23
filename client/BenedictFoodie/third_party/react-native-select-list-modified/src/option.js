@@ -1,16 +1,13 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
-class Option extends Component {
-  render() {
-    const { children, last } = this.props;
 
-    return (
-      <View style={[styles.option, last ? styles.last : {}, this.props.optionStyle]}>
-        <Text style={[styles.text, this.props.optionTextStyle]}>{ children }</Text>
-      </View>
-    );
-  }
+const Option = ({ children }) => {
+  return (
+    <View style={[styles.option]}>
+      <Text style={[styles.text]}>{children}</Text>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -21,12 +18,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     paddingVertical: 10,
   },
-  last: {
-    borderBottomWidth: 0,
-  },
   text: {
     paddingHorizontal: 5,
   },
 });
 
-module.exports = Option;
+module.exports = Option

@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, Dimensions, Platform, TouchableWithoutFeedback } from 'react-native';
 
-import Caret from './caret';
 import List from './list';
 
-const window = Dimensions.get('window');
 
 class Select extends Component {
   constructor(props) {
@@ -54,19 +52,7 @@ class Select extends Component {
   render() {
     const { padding, caret } = this.props;
 
-    let offset = 2 * padding;
-
-    if (caret) {
-      if (typeof (caret) !== "string") {
-        try {
-          offset += caret.props.style.width;
-        } catch (error) {
-          console.error('Add style with width and height to caret image.');
-        }
-      } else {
-        offset += 15;
-      }
-    }
+    let offset = 2 * padding + 15;
 
     return (
       <View
@@ -83,7 +69,6 @@ class Select extends Component {
               numberOfLines={1}
               lineBreakMode='tail'
             >{this.state.value}</Text>
-            <Caret element={caret} size={this.props.caretSize} color={this.props.caretColor} />
           </View>
         </TouchableWithoutFeedback>
         {

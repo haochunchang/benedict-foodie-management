@@ -1,85 +1,69 @@
-import React, { Component } from 'react';
+import React, { useRef, useState } from 'react';
 import { StyleSheet, View, Modal, TouchableWithoutFeedback, Dimensions, Text, ScrollView, Animated } from 'react-native';
 
-const window = Dimensions.get('window');
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-class List extends Component {
-  constructor() {
-    super();
+const List = (props) => {
+  const [x, onChangeX] = useState(0)
+  const [y, onChangeY] = useState(0)
+  const [width, onChangeWidth] = useState(0)
+  const [height, onChangeHeight] = useState(0)
+  const [list, onChangeList] = useState(0)
+  const listRef = useRef(null);
 
-    this.state = {
-      x: 0,
-      y: 0,
-      width: 0,
-      height: 0,
-      list: 0,
-    }
-  }
-
-  measureProps() {
-    this.refs.list.measure((x, y, width, height) => {
-      this.setState({
-        list: height,
-      });
-    });
-    this.props.select.measureInWindow((x, y, width, height) => {
-      this.setState({
-        x: x,
-        y: y,
-        width: width,
-        height: height,
-      });
+  const measureProps = () => {
+    onChangeList(height);
+    props.select.measureInWindow((x, y, width, height) => {
+      onChangeX(x);
+      onChangeY(y);
+      onChangeWidth(width);
+      onChangeHeight(height);
     });
   }
 
-  render() {
-    const { children, position } = this.props;
-
-    return (
-      <Modal
-        transparent={true}>
-        <TouchableWithoutFeedback onPress={this.props.onOverlayPress}>
-          <View style={{ flex: 1}}></View>
-        </TouchableWithoutFeedback>
-        <View
-          onLayout={this.measureProps.bind(this)}
-          ref="list"
-          style={[
-            styles.list,
+  const { children, position } = props;
+  return (
+    <Modal transparent={true}>
+      <TouchableWithoutFeedback onPress={props.onOverlayPress}>
+        <View style={{ flex: 1 }}></View>
+      </TouchableWithoutFeedback>
+      <View
+        onLayout={measureProps}
+        ref={listRef}
+        style={[
+          styles.list,
+          {
+            width: width,
+            maxHeight: props.height,
+            left: x,
+            top: y + (position === 'down' ? height : -list),
+            opacity: list ? 1 : 0,
+          },
+          props.style
+        ]}>
+        <View>
+          <AnimatedScrollView
+            automaticallyAdjustContentInsets={false}
+            bounces={false}>
             {
-              width: this.state.width,
-              maxHeight: this.props.height,
-              left: this.state.x,
-              top: this.state.y + (position === 'down' ? this.state.height : -this.state.list),
-              opacity: this.state.list ? 1 : 0,
-            },
-            this.props.style
-          ]}>
-          <View>
-            <AnimatedScrollView
-              automaticallyAdjustContentInsets={false}
-              bounces={false}>
-                {
-                  children.map((item, index) => {
-                    return (
-                      <TouchableWithoutFeedback
-                        key={index}
-                        onPress={() => { this.props.onOptionPressed(item.props.value, item.props.children)}}
-                        >
-                        <View>
-                          {item}
-                        </View>
-                      </TouchableWithoutFeedback>
-                    );
-                  })
-                }
-            </AnimatedScrollView>
-          </View>
+              children.map((item, index) => {
+                return (
+                  <TouchableWithoutFeedback
+                    key={index}
+                    onPress={() => { props.onOptionPressed(item.props.value, item.props.children) }}
+                  >
+                    <View>
+                      {item}
+                    </View>
+                  </TouchableWithoutFeedback>
+                );
+              })
+            }
+          </AnimatedScrollView>
         </View>
-      </Modal>
-    );
-  }
+      </View>
+    </Modal>
+  );
 }
 
 const styles = StyleSheet.create({

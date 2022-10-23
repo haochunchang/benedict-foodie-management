@@ -25,7 +25,9 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 
 import FoodCalendar from './containers/food_calendar';
-import { FoodForm } from './containers/forms'
+import { FoodForm, RecordForm } from './containers/forms'
+
+const backendUrl = 'http://192.168.1.101:8080'
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
  * LTI update could not be added via codemod */
@@ -58,6 +60,7 @@ const Section = ({ children, title }): Node => {
 const App: () => Node = () => {
 
   const [isCreatingFood, onChangeIsCreatingFood] = React.useState(false);
+  const [today, onChangeToday] = React.useState("");
 
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -86,10 +89,17 @@ const App: () => Node = () => {
             accessibilityLabel="This button is used to add food"
           />
           <Modal visible={isCreatingFood}>
-            <FoodForm closeHandle={onChangeIsCreatingFood} />
+            <FoodForm closeHandle={onChangeIsCreatingFood} backendUrl={backendUrl} />
           </Modal>
           <Section title="Food Calendar">
-            <FoodCalendar />
+            <FoodCalendar createForm={(date) => { onChangeToday(date) }} />
+            <Modal visible={today !== ""}>
+              <RecordForm
+                today={today}
+                closeHandle={() => { onChangeToday("") }}
+                backendUrl={backendUrl}
+              />
+            </Modal>
           </Section>
         </View>
       </ScrollView>
