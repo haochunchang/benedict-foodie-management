@@ -25,8 +25,10 @@ type Repository interface {
 // FoodRepoistory stores the food information
 type FoodRepository interface {
 	Repository
-	CreateFood(food Food) error
-	GetFoodByName(name string) Food
+	CreateFood(Food) error
+	GetFoodByName(string) Food
+	UpdateFoodByName(string, Food) error
+	DeleteFood(Food) error
 }
 
 type FoodRepositoryPSQL struct {
@@ -58,11 +60,25 @@ func (f *FoodRepositoryPSQL) GetFoodByName(name string) Food {
 	return result
 }
 
+func (f *FoodRepositoryPSQL) UpdateFoodByName(name string, food Food) error {
+	var oldFood Food
+	if err := f.db.Where("name = ?", name).Find(&oldFood).Error; err != nil {
+		return err
+	}
+	return f.db.Model(&oldFood).Updates(food).Error
+}
+
+func (f *FoodRepositoryPSQL) DeleteFood(food Food) error {
+	return f.db.Where("name = ?", food.Name).Delete(&food).Error
+}
+
 // RecordRepoistory stores the food record data
 type RecordRepository interface {
 	Repository
-	CreateRecord(r Record) error
-	GetRecordsByDate(eatingDate string) ([]Record, error)
+	CreateRecord(Record) error
+	GetRecordsByDate(string) ([]Record, error)
+	UpdateRecordByDate(string, Record) error
+	DeleteRecord(Record) error
 }
 
 type RecordRepositoryPSQL struct {
@@ -100,4 +116,12 @@ func (rr *RecordRepositoryPSQL) GetRecordsByDate(eatingDate string) ([]Record, e
 	query := rr.db.Model(&Record{}).Preload("Food")
 	query.Where("eating_date BETWEEN ? AND ?", start, end).Find(&results)
 	return results, nil
+}
+
+func (rr *RecordRepositoryPSQL) UpdateRecordByDate(date string, record Record) error {
+	return nil
+}
+
+func (rr *RecordRepositoryPSQL) DeleteRecord(record Record) error {
+	return rr.db.Delete(&record).Error
 }

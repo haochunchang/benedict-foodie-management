@@ -48,6 +48,37 @@ func TestGetFood(t *testing.T) {
 	}
 }
 
+func TestUpdateFoodByName(t *testing.T) {
+	name := "hororo"
+	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
+	food := Food{Name: name, Type: "wet", PurchaseDate: date}
+	if foodRepo.CreateFood(food) != nil {
+		t.Fatal("Failed to create food")
+	}
+
+	newName := "hihi"
+	newFood := Food{Name: newName}
+	if err := foodRepo.UpdateFoodByName("hororo", newFood); err != nil {
+		t.Errorf("Failed to update food, got %v", err)
+	}
+	res := foodRepo.GetFoodByName(newName)
+	if res.Name != newName {
+		t.Errorf("Incorrect food name\nExpect %s, got %s", newName, res.Name)
+	}
+}
+
+func TestDeleteFood(t *testing.T) {
+	name := "hororo"
+	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
+	food := Food{Name: name, Type: "wet", PurchaseDate: date}
+	if foodRepo.CreateFood(food) != nil {
+		t.Fatal("Failed to create food")
+	}
+	if err := foodRepo.DeleteFood(food); err != nil {
+		t.Errorf("Failed to delete food, got %v", err)
+	}
+}
+
 func TestGetRecordByDate(t *testing.T) {
 	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
 	food := Food{Name: "hororo", Type: "wet", PurchaseDate: date}
