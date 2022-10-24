@@ -107,3 +107,22 @@ func TestGetRecordByDate(t *testing.T) {
 		t.Errorf("Incorrect food\n Expect %v, got %v", food.Name, result[0].FoodName)
 	}
 }
+
+func TestDeleteRecord(t *testing.T) {
+	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
+	food := Food{Name: "hororo", Type: "wet", PurchaseDate: date}
+	if foodRepo.CreateFood(food) != nil {
+		t.Fatal("Failed to create food")
+	}
+
+	target := Record{
+		FoodName:   food.Name,
+		EatingDate: date,
+	}
+	if recordRepo.CreateRecord(target) != nil {
+		t.Fatal("Failed to create record")
+	}
+	if err := recordRepo.DeleteRecord(target); err != nil {
+		t.Errorf("Failed to delete record, got %v", err)
+	}
+}

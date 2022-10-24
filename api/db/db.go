@@ -113,8 +113,7 @@ func (rr *RecordRepositoryPSQL) GetRecordsByDate(eatingDate string) ([]Record, e
 	start := strings.Split(eatingDate, "T")[0] + "T00:00:00+08:00"
 	end := strings.Split(eatingDate, "T")[0] + "T23:59:59+08:00"
 
-	query := rr.db.Model(&Record{}).Preload("Food")
-	query.Where("eating_date BETWEEN ? AND ?", start, end).Find(&results)
+	rr.db.Where("eating_date BETWEEN ? AND ?", start, end).Find(&results)
 	return results, nil
 }
 
@@ -123,5 +122,5 @@ func (rr *RecordRepositoryPSQL) UpdateRecordByDate(date string, record Record) e
 }
 
 func (rr *RecordRepositoryPSQL) DeleteRecord(record Record) error {
-	return rr.db.Delete(&record).Error
+	return rr.db.Where("eating_date = ?", record.EatingDate).Delete(&record).Error
 }
