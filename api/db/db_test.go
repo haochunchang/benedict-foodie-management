@@ -56,7 +56,7 @@ func TestGetRecordByDate(t *testing.T) {
 	}
 
 	target := Record{
-		Food:       food,
+		FoodName:   food.Name,
 		EatingDate: date,
 	}
 	if recordRepo.CreateRecord(target) != nil {
@@ -72,7 +72,7 @@ func TestGetRecordByDate(t *testing.T) {
 	if result[0].EatingDate != date {
 		t.Errorf("Eating date is incorrect\n Expect %s, got %v", date, result[0].EatingDate)
 	}
-	if result[0].Food.Name != food.Name {
-		t.Errorf("Incorrect food\n Expect %v, got %v", food.Name, result[0].Food.Name)
+	if result[0].FoodName != food.Name {
+		t.Errorf("Incorrect food\n Expect %v, got %v", food.Name, result[0].FoodName)
 	}
 }
