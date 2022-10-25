@@ -5,8 +5,15 @@ import {
 } from "react-native"
 import { Select, Option } from '../third_party/react-native-select-list-modified';
 
+const SatisfactionScoreDescription = {
+    1: "Does not eat with snack added",
+    2: "Finish eating with snack",
+    3: "Finish eating",
+    4: "Eating eagerly",
+    5: "Eating eagerly with talking",
+}
 
-const FoodDropdownList = ({ handle }) => {
+const FoodTypeDropdownList = ({ handle }) => {
     return (
         <Select onSelect={(value) => { handle(value) }}>
             <Option value={'dry'}>Dry Food</Option>
@@ -16,14 +23,14 @@ const FoodDropdownList = ({ handle }) => {
     );
 };
 
-const SatisfactionScoreDropdown = ({ handle }) => {
+const SatisfactionScoreDropdown = ({ initScore, handle }) => {
     return (
-        <Select onSelect={(value) => { handle(value) }}>
-            <Option value={1}>Does not eat with snack added</Option>
-            <Option value={2}>Finish eating with snack</Option>
-            <Option value={3}>Finish eating</Option>
-            <Option value={4}>Eating eagerly</Option>
-            <Option value={5}>Eating eagerly with talking</Option>
+        <Select default={SatisfactionScoreDescription[initScore]} onSelect={(value) => { handle(value) }}>
+            <Option value={1}>{SatisfactionScoreDescription[1]}</Option>
+            <Option value={2}>{SatisfactionScoreDescription[2]}</Option>
+            <Option value={3}>{SatisfactionScoreDescription[3]}</Option>
+            <Option value={4}>{SatisfactionScoreDescription[4]}</Option>
+            <Option value={5}>{SatisfactionScoreDescription[5]}</Option>
         </Select >
     );
 };
@@ -54,7 +61,6 @@ export const FoodForm = ({ closeHandle, backendUrl }) => {
             Quantity: quantity,
         };
         onChangeIsLoading(true);
-        // TODO: url should be specified
         sendPostRequest(`${backendUrl}/food`, food, onChangeIsLoading);
     }
 
@@ -69,7 +75,7 @@ export const FoodForm = ({ closeHandle, backendUrl }) => {
                 autoFocus={true}
             />
             <Text>Food type</Text>
-            <FoodDropdownList handle={onChangeType} />
+            <FoodTypeDropdownList handle={onChangeType} />
             <Text>Purchase Date</Text>
             <TextInput
                 onChangeText={onChangePurchaseDate}
@@ -96,7 +102,7 @@ export const FoodForm = ({ closeHandle, backendUrl }) => {
     )
 }
 
-export const RecordForm = ({ today, closeHandle, backendUrl }) => {
+export const RecordForm = ({ record, closeHandle, backendUrl }) => {
     /**
      * RecordForm consists of
      *  - Food name
@@ -106,25 +112,31 @@ export const RecordForm = ({ today, closeHandle, backendUrl }) => {
      *  - Description
      *  - PhotoURL
      */
-    const [name, onChangeName] = useState("");
-    const [eatingDate, onChangeEatingDate] = useState(today);
-    const [quantity, onChangeQuantity] = useState(0);
-    const [score, onChangeScore] = useState(1);
-    const [desc, onChangeDesc] = useState("");
+    const [name, onChangeName] = useState(record.Name);
+    const [eatingDate, onChangeEatingDate] = useState(record.EatingDate);
+    const [quantity, onChangeQuantity] = useState(record.EatenQuantity.toString());
+    const [score, onChangeScore] = useState(record.SatisfactionScore);
+    const [desc, onChangeDesc] = useState(record.Description);
     const [isLoading, onChangeIsLoading] = useState(false);
     // TODO: handle images uploading
     // const [photoURL, onChangePhotoURL] = useState("");
 
-    const submitRecordForm = () => {
+    const submitRecord = () => {
         const record = {
             name: name,
             eatingDate: eatingDate,
-            quantity: quantity,
+            quantity: Number.parseFloat(quantity),
             satisfactionScore: score,
             description: desc
         };
-        sendPostRequest(`${backendUrl}/record`, record, onChangeIsLoading);
+        onChangeIsLoading(true);
+        sendPostRequest(`${backendUrl}/records`, record, onChangeIsLoading);
+        // add marked dates
     };
+
+    const updateRecord = () => {
+
+    }
 
     return (
         <View>
@@ -134,22 +146,24 @@ export const RecordForm = ({ today, closeHandle, backendUrl }) => {
             <TextInput
                 onChangeText={onChangeName}
                 value={name}
+                defaultValue={name}
                 placeholder="Enter the food name"
                 autoFocus={true}
             />
             <Text>Satisfaction Score</Text>
-            <SatisfactionScoreDropdown handle={onChangeScore} />
+            <SatisfactionScoreDropdown initScore={score} handle={onChangeScore} />
             <Text>Eating Date</Text>
             <TextInput
                 onChangeText={onChangeEatingDate}
                 value={eatingDate}
-                defaultValue={today}
+                defaultValue={eatingDate}
                 keyboardType="numeric"
             />
             <Text>Eaten quantity</Text>
             <TextInput
                 onChangeText={onChangeQuantity}
                 value={quantity}
+                defaultValue={quantity}
                 placeholder="How many bags or cans?"
                 keyboardType="numeric"
             />
@@ -157,9 +171,14 @@ export const RecordForm = ({ today, closeHandle, backendUrl }) => {
             <TextInput
                 onChangeText={onChangeDesc}
                 value={desc}
+                defaultValue={desc}
                 placeholder="What's about the food?"
             />
-            <Button title="Submit" onPress={submitRecordForm} disabled={isLoading} />
+            <Button
+                title={record.isModifying ? "Update" : "Add"}
+                onPress={record.isModifying ? updateRecord : submitRecord}
+                disabled={isLoading}
+            />
             <Button title="Cancel" onPress={closeHandle} />
         </View>
     )

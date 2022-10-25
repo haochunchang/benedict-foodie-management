@@ -59,11 +59,17 @@ const Section = ({ children, title }): Node => {
 
 const App: () => Node = () => {
 
+  const defaultRecord = {
+    Name: "",
+    EatingDate: "",
+    EatenQuantity: 0,
+    SatisfactionScore: 0,
+    isModifying: false
+  };
   const [isCreatingFood, onChangeIsCreatingFood] = React.useState(false);
-  const [today, onChangeToday] = React.useState("");
+  const [curRecord, onChangeCurRecord] = React.useState(defaultRecord);
 
   const isDarkMode = useColorScheme() === 'dark';
-
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
@@ -81,7 +87,8 @@ const App: () => Node = () => {
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
+          }}
+        >
           <Button
             onPress={() => { onChangeIsCreatingFood(true) }}
             title="Add Food"
@@ -91,12 +98,17 @@ const App: () => Node = () => {
           <Modal visible={isCreatingFood}>
             <FoodForm closeHandle={onChangeIsCreatingFood} backendUrl={backendUrl} />
           </Modal>
+
           <Section title="Food Calendar">
-            <FoodCalendar createForm={(date) => { onChangeToday(date) }} />
-            <Modal visible={today !== ""}>
+            <FoodCalendar
+              createForm={(rec) => { onChangeCurRecord(rec) }}
+              backendUrl={backendUrl}
+              currentMonth={new Date().getMonth() + 1}
+            />
+            <Modal visible={curRecord.EatingDate !== ""}>
               <RecordForm
-                today={today}
-                closeHandle={() => { onChangeToday("") }}
+                record={curRecord}
+                closeHandle={() => { onChangeCurRecord(defaultRecord) }}
                 backendUrl={backendUrl}
               />
             </Modal>

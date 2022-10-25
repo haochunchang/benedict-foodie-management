@@ -1,27 +1,59 @@
+import axios from "axios";
+import { useState } from "react";
 import { Calendar } from "react-native-calendars";
 
-const FoodCalendar = ({ createForm }) => {
+const FoodCalendar = ({ createForm, backendUrl, currentMonth }) => {
+
+    // Fetch current month record
+    let currentRecords = {
+        '2022-10-31': {
+            isModifying: true,
+            Name: "hororo",
+            EatingDate: "2022-10-31",
+            EatenQuantity: 1,
+            SatisfactionScore: 3,
+            Description: "This is a can food"
+        }
+    };
+    // axios.get(`${backendUrl}/records?month=${currentMonth}`)
+    //     .then(response => response.json())
+    //     .catch(err => alert(err))
+    //     .then(result => {
+    //         for (const res of result) {
+    //             currentRecords[res.eating_date] = res;
+    //             currentRecords[res.eating_date].isModifying = true;
+    //         }
+    //     });
+
+    let initMarkedDates = {};
+    for (r in currentRecords) {
+        initMarkedDates[r] = { marked: true, selectedColor: 'blue' }
+    }
+    const [markedDates, onChangeMarkedDates] = useState(initMarkedDates);
+
     return <Calendar
-        onDayPress={day => {
-            createForm(day.dateString);
+        onDayPress={({ dateString }) => {
+            if (dateString in markedDates) {
+                createForm(currentRecords[dateString])
+            } else {
+                createForm({
+                    Name: "",
+                    EatingDate: dateString,
+                    EatenQuantity: 0,
+                    SatisfactionScore: 0,
+                    isModifying: false
+                });
+            }
         }}
-        onDayLongPress={day => {
-            console.log('selected day', day);
-        }}
+        markedDates={markedDates}
         // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
-        monthFormat={'yyyy MM'}
-        // Do not show days of other months in month page. Default = false
+        monthFormat={'yyyy-MMM'}
         hideExtraDays={true}
-        // If firstDay=1 week starts from Monday. Note that dayNames and dayNamesShort should still start from Sunday
         firstDay={1}
         hideDayNames={false}
         onPressArrowLeft={subtractMonth => subtractMonth()}
         onPressArrowRight={addMonth => addMonth()}
         disableAllTouchEventsForDisabledDays={true}
-        // Replace default month and year title with custom one. the function receive a date as parameter
-        renderHeader={date => {
-            /*Return JSX*/
-        }}
         enableSwipeMonths={true}
     />
 }

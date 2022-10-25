@@ -50,7 +50,7 @@ class Select extends Component {
   }
 
   render() {
-    const { padding, caret } = this.props;
+    const { padding } = this.props;
 
     let offset = 2 * padding + 15;
 
