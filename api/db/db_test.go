@@ -1,38 +1,29 @@
 package db
 
 import (
-	"fmt"
 	"os"
 	"testing"
 	"time"
-
-	"gorm.io/gorm"
 )
-
-var testingConnectionInfo string = fmt.Sprintf(
-	"host=localhost user=%s password=%s dbname=unittest port=5432 sslmode=disable TimeZone=Asia/Taipei",
-	os.Getenv("username"), os.Getenv("password"),
-)
-
-var Db *gorm.DB = GetDB(testingConnectionInfo)
 
 func TestMain(m *testing.M) {
-	clearTables()
-	InitDB(testingConnectionInfo)
-	code := m.Run()
-	clearTables()
-	os.Exit(code)
-}
+	foodRepo.Clear()
+	recordRepo.Clear()
 
-func clearTables() {
-	Db.Exec("DROP TABLE IF EXISTS records")
-	Db.Exec("DROP TABLE IF EXISTS foods")
+	foodRepo.Init()
+	recordRepo.Init()
+
+	code := m.Run()
+
+	foodRepo.Clear()
+	recordRepo.Clear()
+	os.Exit(code)
 }
 
 func TestCreateFood(t *testing.T) {
 	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
 	food := Food{Name: "hororo", Type: "wet", PurchaseDate: date}
-	if err := CreateFood(Db, food); err != nil {
+	if err := foodRepo.CreateFood(food); err != nil {
 		t.Errorf("Failed to create food, got %v", err)
 	}
 }
@@ -41,11 +32,11 @@ func TestGetFood(t *testing.T) {
 	name := "hororo"
 	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
 	food := Food{Name: name, Type: "wet", PurchaseDate: date}
-	if CreateFood(Db, food) != nil {
+	if foodRepo.CreateFood(food) != nil {
 		t.Fatal("Failed to create food")
 	}
 
-	res := GetFoodByName(Db, name)
+	res := foodRepo.GetFoodByName(name)
 	if res.Name != food.Name {
 		t.Errorf("Incorrect food name\nExpect %v, got %v", food.Name, res.Name)
 	}
@@ -57,21 +48,52 @@ func TestGetFood(t *testing.T) {
 	}
 }
 
+func TestUpdateFoodByName(t *testing.T) {
+	name := "hororo"
+	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
+	food := Food{Name: name, Type: "wet", PurchaseDate: date}
+	if foodRepo.CreateFood(food) != nil {
+		t.Fatal("Failed to create food")
+	}
+
+	newName := "hihi"
+	newFood := Food{Name: newName}
+	if err := foodRepo.UpdateFoodByName("hororo", newFood); err != nil {
+		t.Errorf("Failed to update food, got %v", err)
+	}
+	res := foodRepo.GetFoodByName(newName)
+	if res.Name != newName {
+		t.Errorf("Incorrect food name\nExpect %s, got %s", newName, res.Name)
+	}
+}
+
+func TestDeleteFood(t *testing.T) {
+	name := "hororo"
+	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
+	food := Food{Name: name, Type: "wet", PurchaseDate: date}
+	if foodRepo.CreateFood(food) != nil {
+		t.Fatal("Failed to create food")
+	}
+	if err := foodRepo.DeleteFood(food); err != nil {
+		t.Errorf("Failed to delete food, got %v", err)
+	}
+}
+
 func TestGetRecordByDate(t *testing.T) {
 	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
 	food := Food{Name: "hororo", Type: "wet", PurchaseDate: date}
-	if CreateFood(Db, food) != nil {
+	if foodRepo.CreateFood(food) != nil {
 		t.Fatal("Failed to create food")
 	}
 
 	target := Record{
-		Food:       food,
+		FoodName:   food.Name,
 		EatingDate: date,
 	}
-	if CreateRecord(Db, target) != nil {
+	if recordRepo.CreateRecord(target) != nil {
 		t.Fatal("Failed to create record")
 	}
-	result, err := GetRecordsByDate(Db, date)
+	result, err := recordRepo.GetRecordsByDate(2022, 10, 21)
 	if err != nil {
 		t.Errorf("Failed to get record by date, got %v", err)
 	}
@@ -81,7 +103,64 @@ func TestGetRecordByDate(t *testing.T) {
 	if result[0].EatingDate != date {
 		t.Errorf("Eating date is incorrect\n Expect %s, got %v", date, result[0].EatingDate)
 	}
-	if result[0].Food.Name != food.Name {
-		t.Errorf("Incorrect food\n Expect %v, got %v", food.Name, result[0].Food.Name)
+	if result[0].FoodName != food.Name {
+		t.Errorf("Incorrect food\n Expect %v, got %v", food.Name, result[0].FoodName)
+	}
+
+	result, err = recordRepo.GetRecordsByDate(2022, 10, 0)
+	if err != nil {
+		t.Errorf("Failed to get record by month, got %v", err)
+	}
+	if result[0].EatingDate != date {
+		t.Errorf("Eating date is incorrect\n Expect %s, got %v", date, result[0].EatingDate)
+	}
+}
+
+func TestDeleteRecord(t *testing.T) {
+	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
+	food := Food{Name: "hororo", Type: "wet", PurchaseDate: date}
+	if foodRepo.CreateFood(food) != nil {
+		t.Fatal("Failed to create food")
+	}
+
+	target := Record{
+		FoodName:   food.Name,
+		EatingDate: date,
+	}
+	if recordRepo.CreateRecord(target) != nil {
+		t.Fatal("Failed to create record")
+	}
+	if err := recordRepo.DeleteRecord(target); err != nil {
+		t.Errorf("Failed to delete record, got %v", err)
+	}
+}
+
+func TestUpdateRecordByDate(t *testing.T) {
+	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
+	food := Food{Name: "hororo", Type: "wet", PurchaseDate: date}
+	if foodRepo.CreateFood(food) != nil {
+		t.Fatal("Failed to create food")
+	}
+
+	target := Record{
+		FoodName:   food.Name,
+		EatingDate: date,
+	}
+	if recordRepo.CreateRecord(target) != nil {
+		t.Fatal("Failed to create record")
+	}
+
+	newRecord := target
+	newRecord.EatenQuantity = 10
+	if err := recordRepo.UpdateRecordByDate(2022, 10, 21, newRecord); err != nil {
+		t.Errorf("Failed to update record, got %v", err)
+	}
+
+	resp, err := recordRepo.GetRecordsByDate(2022, 10, 21)
+	if err != nil {
+		t.Errorf("Failed to get record, got %v", err)
+	}
+	if len(resp) != 1 || resp[0].EatenQuantity != 10 {
+		t.Errorf("Incorrect updated record, got %v", resp)
 	}
 }
