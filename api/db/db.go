@@ -79,6 +79,7 @@ type RecordRepository interface {
 	GetRecordsByDate(string) ([]Record, error)
 	UpdateRecordByDate(string, Record) error
 	DeleteRecord(Record) error
+	GetRecordsByMonth(int, int) ([]Record, error)
 }
 
 type RecordRepositoryPSQL struct {
@@ -123,4 +124,14 @@ func (rr *RecordRepositoryPSQL) UpdateRecordByDate(date string, record Record) e
 
 func (rr *RecordRepositoryPSQL) DeleteRecord(record Record) error {
 	return rr.db.Where("eating_date = ?", record.EatingDate).Delete(&record).Error
+}
+
+func (rr *RecordRepositoryPSQL) GetRecordsByMonth(year, month int) ([]Record, error) {
+	var results []Record
+	startTime := time.Date(year, time.Month(month), 0, 0, 0, 0, 0, time.Local)
+	endTime := time.Date(year, time.Month(month+1), 0, 0, 0, 0, 0, time.Local).Add(-time.Second)
+	start := startTime.Format(time.RFC3339)
+	end := endTime.Format(time.RFC3339)
+	rr.db.Where("eating_date BETWEEN ? AND ?", start, end).Find(&results)
+	return results, nil
 }

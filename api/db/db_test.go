@@ -126,3 +126,26 @@ func TestDeleteRecord(t *testing.T) {
 		t.Errorf("Failed to delete record, got %v", err)
 	}
 }
+
+func TestGetRecordsByMonth(t *testing.T) {
+	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
+	food := Food{Name: "hororo", Type: "wet", PurchaseDate: date}
+	if foodRepo.CreateFood(food) != nil {
+		t.Fatal("Failed to create food")
+	}
+
+	target := Record{
+		FoodName:   food.Name,
+		EatingDate: date,
+	}
+	if recordRepo.CreateRecord(target) != nil {
+		t.Fatal("Failed to create record")
+	}
+	res, err := recordRepo.GetRecordsByMonth(2022, 10)
+	if err != nil {
+		t.Errorf("Failed to get record by month, got %v", err)
+	}
+	if len(res) != 1 || res[0].EatingDate != date {
+		t.Errorf("Incorrect record, got %v", res)
+	}
+}
