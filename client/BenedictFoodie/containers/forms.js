@@ -61,7 +61,7 @@ export const FoodForm = ({ closeHandle, backendUrl }) => {
             Quantity: quantity,
         };
         onChangeIsLoading(true);
-        sendPostRequest(`${backendUrl}/food`, food, onChangeIsLoading);
+        sendRequest(axios.post(`${backendUrl}/foods`, food), onChangeIsLoading);
     }
 
     return (
@@ -130,12 +130,20 @@ export const RecordForm = ({ record, closeHandle, backendUrl }) => {
             description: desc
         };
         onChangeIsLoading(true);
-        sendPostRequest(`${backendUrl}/records`, record, onChangeIsLoading);
-        // add marked dates
+        sendRequest(axios.post(`${backendUrl}/records`, record), onChangeIsLoading);
+        // TODO: add marked dates
     };
 
     const updateRecord = () => {
-
+        const record = {
+            name: name,
+            eatingDate: eatingDate,
+            quantity: Number.parseFloat(quantity),
+            satisfactionScore: score,
+            description: desc
+        };
+        onChangeIsLoading(true);
+        sendRequest(axios.put(`${backendUrl}/records`, record), onChangeIsLoading);
     }
 
     return (
@@ -184,9 +192,9 @@ export const RecordForm = ({ record, closeHandle, backendUrl }) => {
     )
 }
 
-const sendPostRequest = (endpoint, data, onChangeIsLoading) => {
-    axios.post(endpoint, data).then((resp) => {
-        if (resp.status == 201) {
+const sendRequest = (requestPromise, onChangeIsLoading) => {
+    requestPromise.then((resp) => {
+        if (resp.status == 201 || resp.status == 200) {
             Alert.alert("Success", resp.data.message, [{ text: "OK" }]);
             onChangeIsLoading(false);
         } else {

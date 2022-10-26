@@ -103,7 +103,6 @@ const App: () => Node = () => {
             <FoodCalendar
               createForm={(rec) => { onChangeCurRecord(rec) }}
               backendUrl={backendUrl}
-              currentMonth={new Date().getMonth() + 1}
             />
             <Modal visible={curRecord.EatingDate !== ""}>
               <RecordForm

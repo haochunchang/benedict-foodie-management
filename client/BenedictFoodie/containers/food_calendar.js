@@ -2,28 +2,21 @@ import axios from "axios";
 import { useState } from "react";
 import { Calendar } from "react-native-calendars";
 
-const FoodCalendar = ({ createForm, backendUrl, currentMonth }) => {
+const FoodCalendar = ({ createForm, backendUrl }) => {
 
     // Fetch current month record
-    let currentRecords = {
-        '2022-10-31': {
-            isModifying: true,
-            Name: "hororo",
-            EatingDate: "2022-10-31",
-            EatenQuantity: 1,
-            SatisfactionScore: 3,
-            Description: "This is a can food"
-        }
-    };
-    // axios.get(`${backendUrl}/records?month=${currentMonth}`)
-    //     .then(response => response.json())
-    //     .catch(err => alert(err))
-    //     .then(result => {
-    //         for (const res of result) {
-    //             currentRecords[res.eating_date] = res;
-    //             currentRecords[res.eating_date].isModifying = true;
-    //         }
-    //     });
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+    let currentRecords = {};
+    axios.get(`${backendUrl}/records/${currentYear}/${currentMonth}`)
+        .then(response => response.json())
+        .catch(err => alert(err))
+        .then(result => {
+            for (const res of result) {
+                currentRecords[res.eating_date] = res;
+                currentRecords[res.eating_date].isModifying = true;
+            }
+        });
 
     let initMarkedDates = {};
     for (r in currentRecords) {
