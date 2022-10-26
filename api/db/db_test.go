@@ -106,6 +106,14 @@ func TestGetRecordByDate(t *testing.T) {
 	if result[0].FoodName != food.Name {
 		t.Errorf("Incorrect food\n Expect %v, got %v", food.Name, result[0].FoodName)
 	}
+
+	result, err = recordRepo.GetRecordsByDate(2022, 10, 0)
+	if err != nil {
+		t.Errorf("Failed to get record by month, got %v", err)
+	}
+	if result[0].EatingDate != date {
+		t.Errorf("Eating date is incorrect\n Expect %s, got %v", date, result[0].EatingDate)
+	}
 }
 
 func TestDeleteRecord(t *testing.T) {

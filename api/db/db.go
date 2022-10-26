@@ -105,8 +105,14 @@ func (rr *RecordRepositoryPSQL) CreateRecord(r Record) error {
 
 func (rr *RecordRepositoryPSQL) GetRecordsByDate(year, month, day int64) ([]Record, error) {
 	var results []Record
-	startTime := time.Date(int(year), time.Month(month), int(day), 0, 0, 0, 0, time.Local)
-	endTime := time.Date(int(year), time.Month(month), int(day+1), 0, 0, 0, 0, time.Local).Add(-time.Second)
+	var startTime, endTime time.Time
+	if day > 0 {
+		startTime = time.Date(int(year), time.Month(month), int(day), 0, 0, 0, 0, time.Local)
+		endTime = time.Date(int(year), time.Month(month), int(day+1), 0, 0, 0, 0, time.Local).Add(-time.Second)
+	} else {
+		startTime = time.Date(int(year), time.Month(month), 0, 0, 0, 0, 0, time.Local)
+		endTime = time.Date(int(year), time.Month(month+1), 0, 0, 0, 0, 0, time.Local).Add(-time.Second)
+	}
 	start := startTime.Format(time.RFC3339)
 	end := endTime.Format(time.RFC3339)
 	rr.db.Where("eating_date BETWEEN ? AND ?", start, end).Find(&results)
