@@ -1,7 +1,6 @@
 package db
 
 import (
-	"strings"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -76,10 +75,9 @@ func (f *FoodRepositoryPSQL) DeleteFood(food Food) error {
 type RecordRepository interface {
 	Repository
 	CreateRecord(Record) error
-	GetRecordsByDate(string) ([]Record, error)
+	GetRecordsByDate(int64, int64, int64) ([]Record, error)
 	UpdateRecordByDate(string, Record) error
 	DeleteRecord(Record) error
-	GetRecordsByMonth(int, int) ([]Record, error)
 }
 
 type RecordRepositoryPSQL struct {
@@ -105,15 +103,12 @@ func (rr *RecordRepositoryPSQL) CreateRecord(r Record) error {
 	return rr.db.Create(&r).Error
 }
 
-func (rr *RecordRepositoryPSQL) GetRecordsByDate(eatingDate string) ([]Record, error) {
+func (rr *RecordRepositoryPSQL) GetRecordsByDate(year, month, day int64) ([]Record, error) {
 	var results []Record
-	_, err := time.Parse(time.RFC3339, eatingDate)
-	if err != nil {
-		return results, err
-	}
-	start := strings.Split(eatingDate, "T")[0] + "T00:00:00+08:00"
-	end := strings.Split(eatingDate, "T")[0] + "T23:59:59+08:00"
-
+	startTime := time.Date(int(year), time.Month(month), int(day), 0, 0, 0, 0, time.Local)
+	endTime := time.Date(int(year), time.Month(month), int(day+1), 0, 0, 0, 0, time.Local).Add(-time.Second)
+	start := startTime.Format(time.RFC3339)
+	end := endTime.Format(time.RFC3339)
 	rr.db.Where("eating_date BETWEEN ? AND ?", start, end).Find(&results)
 	return results, nil
 }
@@ -124,14 +119,4 @@ func (rr *RecordRepositoryPSQL) UpdateRecordByDate(date string, record Record) e
 
 func (rr *RecordRepositoryPSQL) DeleteRecord(record Record) error {
 	return rr.db.Where("eating_date = ?", record.EatingDate).Delete(&record).Error
-}
-
-func (rr *RecordRepositoryPSQL) GetRecordsByMonth(year, month int) ([]Record, error) {
-	var results []Record
-	startTime := time.Date(year, time.Month(month), 0, 0, 0, 0, 0, time.Local)
-	endTime := time.Date(year, time.Month(month+1), 0, 0, 0, 0, 0, time.Local).Add(-time.Second)
-	start := startTime.Format(time.RFC3339)
-	end := endTime.Format(time.RFC3339)
-	rr.db.Where("eating_date BETWEEN ? AND ?", start, end).Find(&results)
-	return results, nil
 }
