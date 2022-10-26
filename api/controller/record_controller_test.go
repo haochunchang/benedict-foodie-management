@@ -65,25 +65,56 @@ func TestCreateRecordRoute(t *testing.T) {
 func TestGetRecordsByDateRoute(t *testing.T) {
 	router := SetupRecordControllers(gin.Default(), recordRepo)
 
+	// Add food
 	food := getSampleFood()
 	json_data, _ := json.Marshal(food)
 	req, _ := http.NewRequest("POST", "/foods", bytes.NewBuffer(json_data))
 	router.ServeHTTP(httptest.NewRecorder(), req)
 
+	// Add records
 	records := getSampleRecords()
 	json_data, _ = json.Marshal(records)
+	req, _ = http.NewRequest("POST", "/records", bytes.NewBuffer(json_data))
+	router.ServeHTTP(httptest.NewRecorder(), req)
 
-	date := "2022-10-23T00:00:00+08:00"
+	// Test get record
 	w := httptest.NewRecorder()
-	req, _ = http.NewRequest(
-		"GET",
-		fmt.Sprintf("/records/%s", date),
-		bytes.NewBuffer(json_data),
-	)
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/records/%d/%d/%d", 2022, 10, 23), nil)
 	router.ServeHTTP(w, req)
 
 	if w.Code != 200 {
-		t.Errorf("Status code not 200, got %d", w.Code)
+		t.Errorf("Status code not 200, got %d: %s", w.Code, w.Body.String())
+	}
+
+	var resp []db.Record
+	json.NewDecoder(w.Body).Decode(&resp)
+	if len(resp) == 0 {
+		t.Errorf("Response not correct, got %d", len(resp))
+	}
+}
+
+func TestGetRecordsByMonthRoute(t *testing.T) {
+	router := SetupRecordControllers(gin.Default(), recordRepo)
+
+	// Add food
+	food := getSampleFood()
+	json_data, _ := json.Marshal(food)
+	req, _ := http.NewRequest("POST", "/foods", bytes.NewBuffer(json_data))
+	router.ServeHTTP(httptest.NewRecorder(), req)
+
+	// Add records
+	records := getSampleRecords()
+	json_data, _ = json.Marshal(records)
+	req, _ = http.NewRequest("POST", "/records", bytes.NewBuffer(json_data))
+	router.ServeHTTP(httptest.NewRecorder(), req)
+
+	// Test get record
+	w := httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/records/%d/%d", 2022, 10), nil)
+	router.ServeHTTP(w, req)
+
+	if w.Code != 200 {
+		t.Errorf("Status code not 200, got %d: %s", w.Code, w.Body.String())
 	}
 
 	var resp []db.Record
