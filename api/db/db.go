@@ -76,7 +76,7 @@ type RecordRepository interface {
 	Repository
 	CreateRecord(Record) error
 	GetRecordsByDate(int64, int64, int64) ([]Record, error)
-	UpdateRecordByDate(string, Record) error
+	UpdateRecordByDate(int64, int64, int64, Record) error
 	DeleteRecord(Record) error
 }
 
@@ -119,8 +119,14 @@ func (rr *RecordRepositoryPSQL) GetRecordsByDate(year, month, day int64) ([]Reco
 	return results, nil
 }
 
-func (rr *RecordRepositoryPSQL) UpdateRecordByDate(date string, record Record) error {
-	return nil
+func (rr *RecordRepositoryPSQL) UpdateRecordByDate(year, month, day int64, record Record) error {
+	var oldRecord Record
+	startTime := time.Date(int(year), time.Month(month), int(day), 0, 0, 0, 0, time.Local)
+	endTime := time.Date(int(year), time.Month(month), int(day+1), 0, 0, 0, 0, time.Local).Add(-time.Second)
+	start := startTime.Format(time.RFC3339)
+	end := endTime.Format(time.RFC3339)
+	rr.db.Where("eating_date BETWEEN ? AND ?", start, end).Find(&oldRecord)
+	return rr.db.Model(&oldRecord).Updates(record).Error
 }
 
 func (rr *RecordRepositoryPSQL) DeleteRecord(record Record) error {

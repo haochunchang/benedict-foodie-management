@@ -134,3 +134,33 @@ func TestDeleteRecord(t *testing.T) {
 		t.Errorf("Failed to delete record, got %v", err)
 	}
 }
+
+func TestUpdateRecordByDate(t *testing.T) {
+	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
+	food := Food{Name: "hororo", Type: "wet", PurchaseDate: date}
+	if foodRepo.CreateFood(food) != nil {
+		t.Fatal("Failed to create food")
+	}
+
+	target := Record{
+		FoodName:   food.Name,
+		EatingDate: date,
+	}
+	if recordRepo.CreateRecord(target) != nil {
+		t.Fatal("Failed to create record")
+	}
+
+	newRecord := target
+	newRecord.EatenQuantity = 10
+	if err := recordRepo.UpdateRecordByDate(2022, 10, 21, newRecord); err != nil {
+		t.Errorf("Failed to update record, got %v", err)
+	}
+
+	resp, err := recordRepo.GetRecordsByDate(2022, 10, 21)
+	if err != nil {
+		t.Errorf("Failed to get record, got %v", err)
+	}
+	if len(resp) != 1 || resp[0].EatenQuantity != 10 {
+		t.Errorf("Incorrect updated record, got %v", resp)
+	}
+}
