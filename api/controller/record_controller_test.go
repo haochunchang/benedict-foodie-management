@@ -123,3 +123,47 @@ func TestGetRecordsByMonthRoute(t *testing.T) {
 		t.Errorf("Response not correct, got %d", len(resp))
 	}
 }
+
+func TestUpdateRecordByDateRoute(t *testing.T) {
+	router := SetupRecordControllers(gin.Default(), recordRepo)
+
+	// Add food
+	food := getSampleFood()
+	json_data, _ := json.Marshal(food)
+	req, _ := http.NewRequest("POST", "/foods", bytes.NewBuffer(json_data))
+	router.ServeHTTP(httptest.NewRecorder(), req)
+
+	// Add records
+	record := getSampleRecords()[0]
+	json_data, _ = json.Marshal(record)
+	req, _ = http.NewRequest("POST", "/records", bytes.NewBuffer(json_data))
+	router.ServeHTTP(httptest.NewRecorder(), req)
+
+	// Test update record
+	w := httptest.NewRecorder()
+	record.EatenQuantity = 5.0
+	json_data, _ = json.Marshal(record)
+	req, _ = http.NewRequest("PUT", fmt.Sprintf("/records/%d/%d/%d", 2022, 10, 22), bytes.NewBuffer(json_data))
+	router.ServeHTTP(w, req)
+
+	if w.Code != 200 {
+		t.Errorf("Status code not 200, got %d", w.Code)
+	}
+	if w.Body.String() != `{"message":"Record updated."}` {
+		t.Errorf("Response incorrect, got %s", w.Body.String())
+	}
+
+	// Test get updated record
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/records/%d/%d/%d", 2022, 10, 22), nil)
+	router.ServeHTTP(w, req)
+
+	if w.Code != 200 {
+		t.Errorf("Status code not 200, got %d: %s", w.Code, w.Body.String())
+	}
+	var resp []db.Record
+	json.NewDecoder(w.Body).Decode(&resp)
+	if len(resp) == 0 {
+		t.Errorf("Response not correct, got %d", len(resp))
+	}
+}
