@@ -42,7 +42,6 @@ func GetRecordsByDate(repo db.RecordRepository) gin.HandlerFunc {
 		if shouldReturn {
 			return
 		}
-
 		day, err := strconv.ParseInt(c.Param("day"), 10, 8)
 		if err != nil {
 			day = 0
@@ -53,10 +52,6 @@ func GetRecordsByDate(repo db.RecordRepository) gin.HandlerFunc {
 		}
 
 		records, err := repo.GetRecordsByDate(year, month, day)
-		if len(records) == 0 {
-			c.JSON(400, gin.H{"message": "Records not found"})
-			return
-		}
 		if err != nil {
 			c.JSON(500, gin.H{"message": "Service unavailable."})
 			return
