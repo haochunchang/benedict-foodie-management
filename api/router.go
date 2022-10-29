@@ -37,12 +37,14 @@ func setupRouter(repos map[string]interface{}) *gin.Engine {
 	if !ok {
 		panic("Food repository is not configured")
 	}
+	food.Init()
 	controller.SetupFoodControllers(r, food)
 
 	record, ok := repos["record"].(*db.RecordRepositoryPSQL)
 	if !ok {
 		panic("Record repository is not configured")
 	}
+	record.Init()
 	controller.SetupRecordControllers(r, record)
 
 	return r

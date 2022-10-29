@@ -46,8 +46,8 @@ func TestCreateRecordRoute(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/foods", bytes.NewBuffer(json_data))
 	router.ServeHTTP(httptest.NewRecorder(), req)
 
-	records := getSampleRecords()
-	json_data, _ = json.Marshal(records)
+	record := getSampleRecords()[0]
+	json_data, _ = json.Marshal(record)
 
 	w := httptest.NewRecorder()
 	req, _ = http.NewRequest("POST", "/records", bytes.NewBuffer(json_data))
@@ -72,7 +72,7 @@ func TestGetRecordsByDateRoute(t *testing.T) {
 	router.ServeHTTP(httptest.NewRecorder(), req)
 
 	// Add records
-	records := getSampleRecords()
+	records := getSampleRecords()[1]
 	json_data, _ = json.Marshal(records)
 	req, _ = http.NewRequest("POST", "/records", bytes.NewBuffer(json_data))
 	router.ServeHTTP(httptest.NewRecorder(), req)
@@ -103,7 +103,7 @@ func TestGetRecordsByMonthRoute(t *testing.T) {
 	router.ServeHTTP(httptest.NewRecorder(), req)
 
 	// Add records
-	records := getSampleRecords()
+	records := getSampleRecords()[0]
 	json_data, _ = json.Marshal(records)
 	req, _ = http.NewRequest("POST", "/records", bytes.NewBuffer(json_data))
 	router.ServeHTTP(httptest.NewRecorder(), req)

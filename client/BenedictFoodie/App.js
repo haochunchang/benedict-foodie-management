@@ -1,13 +1,10 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
+ * Benedict Foodie App
+ * https://github.com/haochunchang/benedict-foodie-management
  * @format
- * @flow strict-local
  */
 
 import React from 'react';
-import type { Node } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -25,13 +22,13 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 
 import FoodCalendar from './containers/food_calendar';
-import { FoodForm, RecordForm } from './containers/forms'
+import { FoodForm } from './containers/forms';
 
 const backendUrl = 'http://192.168.1.101:8080'
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
  * LTI update could not be added via codemod */
-const Section = ({ children, title }): Node => {
+const Section = ({ children, title }) => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={styles.sectionContainer}>
@@ -57,13 +54,11 @@ const Section = ({ children, title }): Node => {
   );
 };
 
-const App: () => Node = () => {
+const App = () => {
 
   const [isCreatingFood, onChangeIsCreatingFood] = React.useState(false);
-  const [today, onChangeToday] = React.useState("");
 
   const isDarkMode = useColorScheme() === 'dark';
-
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
@@ -81,7 +76,8 @@ const App: () => Node = () => {
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
+          }}
+        >
           <Button
             onPress={() => { onChangeIsCreatingFood(true) }}
             title="Add Food"
@@ -92,14 +88,9 @@ const App: () => Node = () => {
             <FoodForm closeHandle={onChangeIsCreatingFood} backendUrl={backendUrl} />
           </Modal>
           <Section title="Food Calendar">
-            <FoodCalendar createForm={(date) => { onChangeToday(date) }} />
-            <Modal visible={today !== ""}>
-              <RecordForm
-                today={today}
-                closeHandle={() => { onChangeToday("") }}
-                backendUrl={backendUrl}
-              />
-            </Modal>
+            <FoodCalendar
+              backendUrl={backendUrl}
+            />
           </Section>
         </View>
       </ScrollView>
