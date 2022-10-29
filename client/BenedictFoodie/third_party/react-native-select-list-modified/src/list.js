@@ -1,9 +1,10 @@
 import React, { useRef, useState } from 'react';
-import { StyleSheet, View, Modal, TouchableWithoutFeedback, Dimensions, Text, ScrollView, Animated } from 'react-native';
+import { StyleSheet, View, Modal, TouchableWithoutFeedback, ScrollView, Animated } from 'react-native';
 
-const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 const List = (props) => {
+  const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
+
   const [x, onChangeX] = useState(0)
   const [y, onChangeY] = useState(0)
   const [width, onChangeWidth] = useState(0)
