@@ -1,8 +1,8 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { View, Modal } from 'react-native';
 import { Calendar } from "react-native-calendars";
 import { RecordForm } from './forms';
-import axios from "axios";
 
 
 const FoodCalendar = ({ backendUrl }) => {

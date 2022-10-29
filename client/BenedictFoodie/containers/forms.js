@@ -1,9 +1,9 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import {
     View, Text, TextInput, Button, Alert,
 } from "react-native"
 import { Select, Option } from '../third_party/react-native-select-list-modified/src';
-import axios from 'axios';
 
 const SatisfactionScoreDescription = {
     1: "Does not eat with snack added",
@@ -123,11 +123,18 @@ export const RecordForm = ({ record, closeForm, backendUrl, dates, onChangeDates
      *  - Description
      *  - PhotoURL
      */
+    if (record === undefined) {
+        record = {
+            Name: "",
+            EatingDate: "",
+            EatenQuantity: 0,
+            SatisfactionScore: 0,
+            Description: "",
+        };
+    }
     const [name, onChangeName] = useState(record.Name);
     const [eatingDate, onChangeEatingDate] = useState(record.EatingDate);
-    const [quantity, onChangeQuantity] = useState(
-        record.EatenQuantity !== undefined ? record.EatenQuantity.toString() : ""
-    );
+    const [quantity, onChangeQuantity] = useState(record.EatenQuantity.toString());
     const [score, onChangeScore] = useState(record.SatisfactionScore);
     const [desc, onChangeDesc] = useState(record.Description);
     const [isLoading, onChangeIsLoading] = useState(false);
