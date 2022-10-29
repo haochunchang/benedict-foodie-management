@@ -1,9 +1,9 @@
-import axios from 'axios'
 import React, { useState } from 'react';
 import {
     View, Text, TextInput, Button, Alert,
 } from "react-native"
-import { Select, Option } from '../third_party/react-native-select-list-modified';
+import { Select, Option } from '../third_party/react-native-select-list-modified/src';
+import axios from 'axios';
 
 const SatisfactionScoreDescription = {
     1: "Does not eat with snack added",
@@ -61,7 +61,18 @@ export const FoodForm = ({ closeHandle, backendUrl }) => {
             Quantity: quantity,
         };
         onChangeIsLoading(true);
-        sendRequest(axios.post(`${backendUrl}/foods`, food), onChangeIsLoading);
+        axios.post(`${backendUrl}/foods`, food)
+            .then((resp) => {
+                if (resp.status == 201 || resp.status == 200) {
+                    onChangeIsLoading(false);
+                    closeHandle();
+                } else {
+                    Alert.alert("Error", resp.data.message, [{ text: "Okay" }]);
+                }
+            }).catch((error) => {
+                Alert.alert("Error", error.message, [{ text: "Okay" }]);
+                onChangeIsLoading(false);
+            });
     }
 
     return (
@@ -102,7 +113,7 @@ export const FoodForm = ({ closeHandle, backendUrl }) => {
     )
 }
 
-export const RecordForm = ({ record, closeHandle, backendUrl }) => {
+export const RecordForm = ({ record, closeForm, backendUrl, dates, onChangeDates }) => {
     /**
      * RecordForm consists of
      *  - Food name
@@ -114,7 +125,9 @@ export const RecordForm = ({ record, closeHandle, backendUrl }) => {
      */
     const [name, onChangeName] = useState(record.Name);
     const [eatingDate, onChangeEatingDate] = useState(record.EatingDate);
-    const [quantity, onChangeQuantity] = useState(record.EatenQuantity.toString());
+    const [quantity, onChangeQuantity] = useState(
+        record.EatenQuantity !== undefined ? record.EatenQuantity.toString() : ""
+    );
     const [score, onChangeScore] = useState(record.SatisfactionScore);
     const [desc, onChangeDesc] = useState(record.Description);
     const [isLoading, onChangeIsLoading] = useState(false);
@@ -130,8 +143,22 @@ export const RecordForm = ({ record, closeHandle, backendUrl }) => {
             description: desc
         };
         onChangeIsLoading(true);
-        sendRequest(axios.post(`${backendUrl}/records`, record), onChangeIsLoading);
-        // TODO: add marked dates
+        axios.post(`${backendUrl}/records`, record)
+            .then((resp) => {
+                if (resp.status == 201) {
+                    const d = dates;
+                    d[record.eatingDate] = record;
+                    d[record.eatingDate].isModifying = true;
+                    onChangeDates(d);
+                    onChangeIsLoading(false);
+                    closeForm();
+                } else {
+                    Alert.alert("Error", resp.data.message, [{ text: "Okay" }]);
+                }
+            }).catch((error) => {
+                Alert.alert("Error", error.message, [{ text: "Okay" }]);
+                onChangeIsLoading(false);
+            });
     };
 
     const updateRecord = () => {
@@ -143,7 +170,18 @@ export const RecordForm = ({ record, closeHandle, backendUrl }) => {
             description: desc
         };
         onChangeIsLoading(true);
-        sendRequest(axios.put(`${backendUrl}/records`, record), onChangeIsLoading);
+        axios.put(`${backendUrl}/records`, record)
+            .then((resp) => {
+                if (resp.status == 200) {
+                    onChangeIsLoading(false);
+                    closeForm();
+                } else {
+                    Alert.alert("Error", resp.data.message, [{ text: "Okay" }]);
+                }
+            }).catch((error) => {
+                Alert.alert("Error", error.message, [{ text: "Okay" }]);
+                onChangeIsLoading(false);
+            });
     }
 
     return (
@@ -187,21 +225,7 @@ export const RecordForm = ({ record, closeHandle, backendUrl }) => {
                 onPress={record.isModifying ? updateRecord : submitRecord}
                 disabled={isLoading}
             />
-            <Button title="Cancel" onPress={closeHandle} />
+            <Button title="Cancel" onPress={closeForm} />
         </View>
     )
-}
-
-const sendRequest = (requestPromise, onChangeIsLoading) => {
-    requestPromise.then((resp) => {
-        if (resp.status == 201 || resp.status == 200) {
-            Alert.alert("Success", resp.data.message, [{ text: "OK" }]);
-            onChangeIsLoading(false);
-        } else {
-            Alert.alert("Error", resp.data.message, [{ text: "Okay" }]);
-        }
-    }).catch((error) => {
-        Alert.alert("Error", error.message, [{ text: "Okay" }]);
-        onChangeIsLoading(false);
-    });
 }

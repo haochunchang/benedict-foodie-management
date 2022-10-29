@@ -1,54 +1,93 @@
-import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { View, Modal } from 'react-native';
 import { Calendar } from "react-native-calendars";
+import { RecordForm } from './forms';
+import axios from "axios";
 
-const FoodCalendar = ({ createForm, backendUrl }) => {
 
-    // Fetch current month record
+const FoodCalendar = ({ backendUrl }) => {
+
+    const defaultRecord = {
+        Name: "",
+        EatingDate: "",
+        EatenQuantity: 0,
+        SatisfactionScore: 0,
+        isModifying: false
+    };
+    const [curRecord, onChangeCurRecord] = useState(defaultRecord);
+    const [thisMonthRecord, onChangeThisMonthRecord] = useState({});
+    const [markedDates, onChangeMarkedDates] = useState({});
+
+    useEffect(() => {
+        fetchCurrentMonthRecord(backendUrl, onChangeThisMonthRecord);
+    }, []);
+    useEffect(() => {
+        onChangeMarkedDates(getMarkedDates(thisMonthRecord));
+    }, [thisMonthRecord, curRecord]);
+
+    return (
+        <View>
+            <Modal visible={curRecord.EatingDate !== ""}>
+                <RecordForm
+                    record={curRecord}
+                    closeForm={() => { onChangeCurRecord(defaultRecord) }}
+                    backendUrl={backendUrl}
+                    dates={thisMonthRecord}
+                    onChangeDates={onChangeThisMonthRecord}
+                />
+            </Modal>
+            <Calendar
+                onDayPress={({ dateString }) => {
+                    if (dateString in markedDates) {
+                        onChangeCurRecord(thisMonthRecord[dateString])
+                    } else {
+                        onChangeCurRecord({
+                            Name: "",
+                            EatingDate: dateString,
+                            EatenQuantity: 0,
+                            SatisfactionScore: 0,
+                            isModifying: false
+                        });
+                    }
+                }}
+                markedDates={markedDates}
+                // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
+                monthFormat={'yyyy-MMM'}
+                hideExtraDays={true}
+                firstDay={1}
+                hideDayNames={false}
+                onPressArrowLeft={subtractMonth => subtractMonth()}
+                onPressArrowRight={addMonth => addMonth()}
+                disableAllTouchEventsForDisabledDays={true}
+                enableSwipeMonths={true}
+            />
+        </View>
+    )
+}
+
+const fetchCurrentMonthRecord = (backendUrl, onChangeThisMonthRecord) => {
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
     let currentRecords = {};
     axios.get(`${backendUrl}/records/${currentYear}/${currentMonth}`)
-        .then(response => response.json())
-        .catch(err => alert(err))
+        .then(response => response.data)
         .then(result => {
             for (const res of result) {
-                currentRecords[res.eating_date] = res;
-                currentRecords[res.eating_date].isModifying = true;
+                currentRecords[res.EatingDate] = res;
+                currentRecords[res.EatingDate].isModifying = true;
             }
-        });
+            onChangeThisMonthRecord(currentRecords);
+        })
+        .catch(err => alert(err));
+}
 
-    let initMarkedDates = {};
-    for (r in currentRecords) {
-        initMarkedDates[r] = { marked: true, selectedColor: 'blue' }
+
+const getMarkedDates = (records) => {
+    let marked = {};
+    for (r in records) {
+        marked[r] = { marked: true, selectedColor: 'blue' };
     }
-    const [markedDates, onChangeMarkedDates] = useState(initMarkedDates);
-
-    return <Calendar
-        onDayPress={({ dateString }) => {
-            if (dateString in markedDates) {
-                createForm(currentRecords[dateString])
-            } else {
-                createForm({
-                    Name: "",
-                    EatingDate: dateString,
-                    EatenQuantity: 0,
-                    SatisfactionScore: 0,
-                    isModifying: false
-                });
-            }
-        }}
-        markedDates={markedDates}
-        // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
-        monthFormat={'yyyy-MMM'}
-        hideExtraDays={true}
-        firstDay={1}
-        hideDayNames={false}
-        onPressArrowLeft={subtractMonth => subtractMonth()}
-        onPressArrowRight={addMonth => addMonth()}
-        disableAllTouchEventsForDisabledDays={true}
-        enableSwipeMonths={true}
-    />
+    return marked;
 }
 
 export default FoodCalendar

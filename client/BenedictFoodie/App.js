@@ -1,13 +1,10 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
+ * Benedict Foodie App
+ * https://github.com/haochunchang/benedict-foodie-management
  * @format
- * @flow strict-local
  */
 
 import React from 'react';
-import type { Node } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -25,13 +22,13 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 
 import FoodCalendar from './containers/food_calendar';
-import { FoodForm, RecordForm } from './containers/forms'
+import { FoodForm } from './containers/forms';
 
 const backendUrl = 'http://192.168.1.101:8080'
 
 /* $FlowFixMe[missing-local-annot] The type annotation(s) required by Flow's
  * LTI update could not be added via codemod */
-const Section = ({ children, title }): Node => {
+const Section = ({ children, title }) => {
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={styles.sectionContainer}>
@@ -57,17 +54,9 @@ const Section = ({ children, title }): Node => {
   );
 };
 
-const App: () => Node = () => {
+const App = () => {
 
-  const defaultRecord = {
-    Name: "",
-    EatingDate: "",
-    EatenQuantity: 0,
-    SatisfactionScore: 0,
-    isModifying: false
-  };
   const [isCreatingFood, onChangeIsCreatingFood] = React.useState(false);
-  const [curRecord, onChangeCurRecord] = React.useState(defaultRecord);
 
   const isDarkMode = useColorScheme() === 'dark';
   const backgroundStyle = {
@@ -98,19 +87,10 @@ const App: () => Node = () => {
           <Modal visible={isCreatingFood}>
             <FoodForm closeHandle={onChangeIsCreatingFood} backendUrl={backendUrl} />
           </Modal>
-
           <Section title="Food Calendar">
             <FoodCalendar
-              createForm={(rec) => { onChangeCurRecord(rec) }}
               backendUrl={backendUrl}
             />
-            <Modal visible={curRecord.EatingDate !== ""}>
-              <RecordForm
-                record={curRecord}
-                closeHandle={() => { onChangeCurRecord(defaultRecord) }}
-                backendUrl={backendUrl}
-              />
-            </Modal>
           </Section>
         </View>
       </ScrollView>
