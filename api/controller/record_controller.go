@@ -13,7 +13,7 @@ func CreateRecords(repo db.RecordRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var data []byte
 		var err error
-		var record []db.Record
+		var record db.Record
 
 		if data, err = ioutil.ReadAll(c.Request.Body); err != nil {
 			c.JSON(400, gin.H{"message": "Error when reading request body."})
@@ -24,11 +24,9 @@ func CreateRecords(repo db.RecordRepository) gin.HandlerFunc {
 			return
 		}
 
-		for _, r := range record {
-			if err = repo.CreateRecord(r); err != nil {
-				c.JSON(500, gin.H{"message": "Something error when creating record."})
-				return
-			}
+		if err = repo.CreateRecord(record); err != nil {
+			c.JSON(500, gin.H{"message": "Something error when creating record."})
+			return
 		}
 		c.JSON(201, gin.H{
 			"message": "Record created",
