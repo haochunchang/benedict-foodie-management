@@ -97,9 +97,6 @@ func (rr *RecordRepositoryPSQL) Clear() {
 }
 
 func (rr *RecordRepositoryPSQL) CreateRecord(r Record) error {
-	if _, err := time.Parse(time.RFC3339, r.EatingDate); err != nil {
-		return err
-	}
 	return rr.db.Create(&r).Error
 }
 
