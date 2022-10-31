@@ -11,12 +11,13 @@ type Food struct {
 	PurchaseDate    string // RFC3339
 	CurrentQuantity float64
 	Description     string
+	RecordID        uint
 }
 
-// A Record belongs to a food
+// A record has one food
 type Record struct {
 	gorm.Model
-	FoodName          string
+	Food              Food
 	Description       string
 	EatingDate        string // RFC3339
 	EatenQuantity     float64

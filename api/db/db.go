@@ -28,6 +28,10 @@ type FoodRepository interface {
 	GetFoodByName(string) Food
 	UpdateFoodByName(string, Food) error
 	DeleteFood(Food) error
+	CreateRecord(Record) error
+	GetRecordsByDate(int64, int64, int64) ([]Record, error)
+	UpdateRecordByDate(int64, int64, int64, Record) error
+	DeleteRecord(Record) error
 }
 
 type FoodRepositoryPSQL struct {
@@ -40,16 +44,15 @@ func NewFoodRepositoryPSQL(conn *gorm.DB) *FoodRepositoryPSQL {
 
 func (f *FoodRepositoryPSQL) Init() {
 	f.db.AutoMigrate(&Food{})
+	f.db.AutoMigrate(&Record{})
 }
 
 func (f *FoodRepositoryPSQL) Clear() {
 	f.db.Exec("DROP TABLE IF EXISTS foods")
+	f.db.Exec("DROP TABLE IF EXISTS records")
 }
 
 func (f *FoodRepositoryPSQL) CreateFood(food Food) error {
-	if _, err := time.Parse(time.RFC3339, food.PurchaseDate); err != nil {
-		return err
-	}
 	return f.db.Create(&food).Error
 }
 
@@ -71,61 +74,36 @@ func (f *FoodRepositoryPSQL) DeleteFood(food Food) error {
 	return f.db.Where("name = ?", food.Name).Delete(&food).Error
 }
 
-// RecordRepoistory stores the food record data
-type RecordRepository interface {
-	Repository
-	CreateRecord(Record) error
-	GetRecordsByDate(int64, int64, int64) ([]Record, error)
-	UpdateRecordByDate(int64, int64, int64, Record) error
-	DeleteRecord(Record) error
+func (f *FoodRepositoryPSQL) CreateRecord(r Record) error {
+	return f.db.Create(&r).Error
 }
 
-type RecordRepositoryPSQL struct {
-	db *gorm.DB
-}
-
-func NewRecordRepositoryPSQL(conn *gorm.DB) *RecordRepositoryPSQL {
-	return &RecordRepositoryPSQL{conn}
-}
-
-func (rr *RecordRepositoryPSQL) Init() {
-	rr.db.AutoMigrate(&Record{})
-}
-
-func (rr *RecordRepositoryPSQL) Clear() {
-	rr.db.Exec("DROP TABLE IF EXISTS records")
-}
-
-func (rr *RecordRepositoryPSQL) CreateRecord(r Record) error {
-	return rr.db.Create(&r).Error
-}
-
-func (rr *RecordRepositoryPSQL) GetRecordsByDate(year, month, day int64) ([]Record, error) {
+func (f *FoodRepositoryPSQL) GetRecordsByDate(year, month, day int64) ([]Record, error) {
 	var results []Record
 	var startTime, endTime time.Time
 	if day > 0 {
 		startTime = time.Date(int(year), time.Month(month), int(day), 0, 0, 0, 0, time.Local)
 		endTime = time.Date(int(year), time.Month(month), int(day+1), 0, 0, 0, 0, time.Local).Add(-time.Second)
 	} else {
-		startTime = time.Date(int(year), time.Month(month), 0, 0, 0, 0, 0, time.Local)
-		endTime = time.Date(int(year), time.Month(month+1), 0, 0, 0, 0, 0, time.Local).Add(-time.Second)
+		startTime = time.Date(int(year), time.Month(month), 1, 0, 0, 0, 0, time.Local)
+		endTime = time.Date(int(year), time.Month(month+1), 1, 0, 0, 0, 0, time.Local).Add(-time.Second)
 	}
 	start := startTime.Format(time.RFC3339)
 	end := endTime.Format(time.RFC3339)
-	rr.db.Where("eating_date BETWEEN ? AND ?", start, end).Find(&results)
+	f.db.Preload("Food").Where("eating_date BETWEEN ? AND ?", start, end).Find(&results)
 	return results, nil
 }
 
-func (rr *RecordRepositoryPSQL) UpdateRecordByDate(year, month, day int64, record Record) error {
+func (f *FoodRepositoryPSQL) UpdateRecordByDate(year, month, day int64, record Record) error {
 	var oldRecord Record
 	startTime := time.Date(int(year), time.Month(month), int(day), 0, 0, 0, 0, time.Local)
 	endTime := time.Date(int(year), time.Month(month), int(day+1), 0, 0, 0, 0, time.Local).Add(-time.Second)
 	start := startTime.Format(time.RFC3339)
 	end := endTime.Format(time.RFC3339)
-	rr.db.Where("eating_date BETWEEN ? AND ?", start, end).Find(&oldRecord)
-	return rr.db.Model(&oldRecord).Updates(record).Error
+	f.db.Preload("Food").Where("eating_date BETWEEN ? AND ?", start, end).Find(&oldRecord)
+	return f.db.Model(&oldRecord).Updates(record).Error
 }
 
-func (rr *RecordRepositoryPSQL) DeleteRecord(record Record) error {
-	return rr.db.Where("eating_date = ?", record.EatingDate).Delete(&record).Error
+func (f *FoodRepositoryPSQL) DeleteRecord(record Record) error {
+	return f.db.Where("eating_date = ?", record.EatingDate).Delete(&record).Error
 }
