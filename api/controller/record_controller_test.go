@@ -15,21 +15,21 @@ import (
 func getSampleRecords() []db.Record {
 	return []db.Record{
 		{
-			FoodName:          "hororo",
+			Food:              db.Food{Name: "hororo"},
 			Description:       "",
 			EatingDate:        "2022-10-22T00:00:00+08:00",
 			EatenQuantity:     0.5,
 			SatisfactionScore: 3,
 		},
 		{
-			FoodName:          "hororo",
+			Food:              db.Food{Name: "hororo"},
 			Description:       "",
 			EatingDate:        "2022-10-23T00:00:00+08:00",
 			EatenQuantity:     0.5,
 			SatisfactionScore: 5,
 		},
 		{
-			FoodName:          "hororo",
+			Food:              db.Food{Name: "hororo"},
 			Description:       "",
 			EatingDate:        "2022-10-24T00:00:00+08:00",
 			EatenQuantity:     0.5,
@@ -39,7 +39,7 @@ func getSampleRecords() []db.Record {
 }
 
 func TestCreateRecordRoute(t *testing.T) {
-	router := SetupRecordControllers(gin.Default(), recordRepo)
+	router := SetupRecordControllers(gin.Default(), repo)
 
 	food := getSampleFood()
 	json_data, _ := json.Marshal(food)
@@ -63,7 +63,7 @@ func TestCreateRecordRoute(t *testing.T) {
 }
 
 func TestGetRecordsByDateRoute(t *testing.T) {
-	router := SetupRecordControllers(gin.Default(), recordRepo)
+	router := SetupRecordControllers(gin.Default(), repo)
 
 	// Add food
 	food := getSampleFood()
@@ -94,7 +94,7 @@ func TestGetRecordsByDateRoute(t *testing.T) {
 }
 
 func TestGetRecordsByMonthRoute(t *testing.T) {
-	router := SetupRecordControllers(gin.Default(), recordRepo)
+	router := SetupRecordControllers(gin.Default(), repo)
 
 	// Add food
 	food := getSampleFood()
@@ -125,7 +125,7 @@ func TestGetRecordsByMonthRoute(t *testing.T) {
 }
 
 func TestUpdateRecordByDateRoute(t *testing.T) {
-	router := SetupRecordControllers(gin.Default(), recordRepo)
+	router := SetupRecordControllers(gin.Default(), repo)
 
 	// Add food
 	food := getSampleFood()

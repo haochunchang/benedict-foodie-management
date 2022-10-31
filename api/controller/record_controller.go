@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CreateRecords(repo db.RecordRepository) gin.HandlerFunc {
+func CreateRecords(repo db.FoodRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var data []byte
 		var err error
@@ -34,7 +34,7 @@ func CreateRecords(repo db.RecordRepository) gin.HandlerFunc {
 	}
 }
 
-func GetRecordsByDate(repo db.RecordRepository) gin.HandlerFunc {
+func GetRecordsByDate(repo db.FoodRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		year, month, shouldReturn := parseDate(c)
 		if shouldReturn {
@@ -58,7 +58,7 @@ func GetRecordsByDate(repo db.RecordRepository) gin.HandlerFunc {
 	}
 }
 
-func UpdateRecordsByDate(repo db.RecordRepository) gin.HandlerFunc {
+func UpdateRecordsByDate(repo db.FoodRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		year, month, shouldReturn := parseDate(c)
 		if shouldReturn {
@@ -118,10 +118,10 @@ func parseDate(c *gin.Context) (int64, int64, bool) {
 	return year, month, false
 }
 
-func SetupRecordControllers(r *gin.Engine, record db.RecordRepository) *gin.Engine {
-	r.POST("/records", CreateRecords(record))
-	r.PUT("/records/:year/:month/:day", UpdateRecordsByDate(record))
-	r.GET("/records/:year/:month/:day", GetRecordsByDate(record))
-	r.GET("/records/:year/:month", GetRecordsByDate(record))
+func SetupRecordControllers(r *gin.Engine, repo db.FoodRepository) *gin.Engine {
+	r.POST("/records", CreateRecords(repo))
+	r.PUT("/records/:year/:month/:day", UpdateRecordsByDate(repo))
+	r.GET("/records/:year/:month/:day", GetRecordsByDate(repo))
+	r.GET("/records/:year/:month", GetRecordsByDate(repo))
 	return r
 }
