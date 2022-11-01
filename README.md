@@ -4,7 +4,7 @@ A food recording system for the Great Benedict
 ---
 ## Functional Requirements
 ### A database to store food records.
-- PostgreSQL
+- PostgreSQL (considering use SQLite to store data on mobile device)
 - Data entitiies:
     - Record
         - Food name
@@ -13,12 +13,13 @@ A food recording system for the Great Benedict
         - Eating quantity
         - Satisfaction score
         - Photo URL
+        - Associated food
     - Food
         - Food name
-        - Nutrition fact
         - Date of purchase
         - Purchase quantity
         - Food type (dry, wet, snack)
+    - Each record has one food
 
 ### Server: Food-related functions
 - Golang Gin Gonic
@@ -38,14 +39,14 @@ Optional
     - Satisfaction score 1-5 to evaluate how Benedict likes it
     - A photo to show the content
 - Use cases:
-    1. I can click the calendar box and pop up a form to fill in today's food name, description, score and upload photo.
-    2. When submit a record with eaten quantity, the database should update the curent stocking of food.
-    3. I can create food through another button to add my current stocking of food.
+    - [x] I can click the calendar box and pop up a form to fill in today's food name, description, score and upload photo.
+    - [x] I can create food through another button to add my current stocking of food.
+    - [ ] When submit a record with eaten quantity, the database should update the curent stocking of food.
 
 ---
 - Evolving data model and interfaces
 - Integrating with external APIs
-    - Twillio: email notification
+    - Twillio: email notification when certain food has zero quantity.
     - Create a Slack app which allows you to send and retrieve messages to your server using Slack.
 - Scaling capacity
     - how can you evolve your server to support more load?

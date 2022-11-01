@@ -24,7 +24,7 @@ func getSampleFood() db.Food {
 }
 
 func TestCreateFoodRoute(t *testing.T) {
-	router := SetupFoodControllers(gin.Default(), foodRepo)
+	router := SetupFoodControllers(gin.Default(), repo)
 
 	food := getSampleFood()
 	json_data, _ := json.Marshal(food)
@@ -43,7 +43,7 @@ func TestCreateFoodRoute(t *testing.T) {
 }
 
 func TestGetFoodbyNameRoute(t *testing.T) {
-	router := SetupFoodControllers(gin.Default(), foodRepo)
+	router := SetupFoodControllers(gin.Default(), repo)
 
 	food := getSampleFood()
 	json_data, _ := json.Marshal(food)
@@ -81,7 +81,7 @@ func TestGetFoodbyNameRoute(t *testing.T) {
 }
 
 func TestUpdateFoodByNameRoute(t *testing.T) {
-	router := SetupFoodControllers(gin.Default(), foodRepo)
+	router := SetupFoodControllers(gin.Default(), repo)
 
 	// POST sample food
 	food := getSampleFood()

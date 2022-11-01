@@ -13,5 +13,4 @@ var testingConnectionInfo string = fmt.Sprintf(
 )
 
 var conn *gorm.DB = GetDB(testingConnectionInfo)
-var foodRepo FoodRepository = &FoodRepositoryPSQL{conn}
-var recordRepo RecordRepository = &RecordRepositoryPSQL{conn}
+var repo FoodRepository = &FoodRepositoryPSQL{conn}

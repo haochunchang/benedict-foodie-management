@@ -15,19 +15,14 @@ var testingConnectionInfo string = fmt.Sprintf(
 )
 
 var conn *gorm.DB = db.GetDB(testingConnectionInfo)
-var foodRepo *db.FoodRepositoryPSQL = db.NewFoodRepositoryPSQL(conn)
-var recordRepo *db.RecordRepositoryPSQL = db.NewRecordRepositoryPSQL(conn)
+var repo *db.FoodRepositoryPSQL = db.NewFoodRepositoryPSQL(conn)
 
 func TestMain(m *testing.M) {
-	recordRepo.Clear()
-	foodRepo.Clear()
-
-	foodRepo.Init()
-	recordRepo.Init()
+	repo.Clear()
+	repo.Init()
 
 	code := m.Run()
 
-	recordRepo.Clear()
-	foodRepo.Clear()
+	repo.Clear()
 	os.Exit(code)
 }

@@ -14,8 +14,7 @@ func main() {
 	conn := db.GetDB(connectionInfo)
 
 	r := setupRouter(map[string]interface{}{
-		"food":   db.NewFoodRepositoryPSQL(conn),
-		"record": db.NewRecordRepositoryPSQL(conn),
+		"food": db.NewFoodRepositoryPSQL(conn),
 	})
 	r.Run(":8080")
 }
