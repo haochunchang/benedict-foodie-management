@@ -61,14 +61,18 @@ export const FoodForm = ({ closeHandle, backendUrl }) => {
             Quantity: quantity,
         };
         onChangeIsLoading(true);
-        axios.post(`${backendUrl}/foods`, food)
-            .then((resp) => {
-                if (resp.status == 201 || resp.status == 200) {
-                    onChangeIsLoading(false);
-                    closeHandle();
-                } else {
-                    Alert.alert("Error", resp.data.message, [{ text: "Okay" }]);
-                }
+        fetch(`${backendUrl}/foods`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(food)
+        })
+            .then((resp) => resp.json())
+            .then((_) => {
+                onChangeIsLoading(false);
+                closeHandle();
             }).catch((error) => {
                 Alert.alert("Error", error.message, [{ text: "Okay" }]);
                 onChangeIsLoading(false);
@@ -113,7 +117,7 @@ export const FoodForm = ({ closeHandle, backendUrl }) => {
     )
 }
 
-export const RecordForm = ({ record, closeForm, backendUrl, dates, onChangeDates }) => {
+export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onChangeThisMonthRecord }) => {
     /**
      * RecordForm consists of
      *  - Food name
@@ -126,15 +130,14 @@ export const RecordForm = ({ record, closeForm, backendUrl, dates, onChangeDates
     if (record === undefined) {
         record = {
             Name: "",
-            EatingDate: "",
             EatenQuantity: 0,
             SatisfactionScore: 0,
             Description: "",
         };
     }
-    const [name, onChangeName] = useState(record.Name);
-    const [eatingDate, onChangeEatingDate] = useState(record.EatingDate);
-    const [quantity, onChangeQuantity] = useState(record.EatenQuantity.toString());
+    const eatingDate = record.EatingDate;
+    const [name, onChangeName] = useState(record.Food.Name);
+    const [quantity, onChangeQuantity] = useState(record.EatenQuantity);
     const [score, onChangeScore] = useState(record.SatisfactionScore);
     const [desc, onChangeDesc] = useState(record.Description);
     const [isLoading, onChangeIsLoading] = useState(false);
@@ -143,25 +146,29 @@ export const RecordForm = ({ record, closeForm, backendUrl, dates, onChangeDates
 
     const submitRecord = () => {
         const record = {
-            name: name,
-            eatingDate: eatingDate,
-            quantity: Number.parseFloat(quantity),
-            satisfactionScore: score,
-            description: desc
+            Food: { Name: name },
+            EatingDate: eatingDate,
+            EatenQuantity: Number.parseFloat(quantity),
+            SatisfactionScore: score,
+            Description: desc
         };
         onChangeIsLoading(true);
-        axios.post(`${backendUrl}/records`, record)
-            .then((resp) => {
-                if (resp.status == 201) {
-                    const d = dates;
-                    d[record.eatingDate] = record;
-                    d[record.eatingDate].isModifying = true;
-                    onChangeDates(d);
-                    onChangeIsLoading(false);
-                    closeForm();
-                } else {
-                    Alert.alert("Error", resp.data.message, [{ text: "Okay" }]);
-                }
+        fetch(`${backendUrl}/records`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(record)
+        })
+            .then((resp) => resp.json())
+            .then((_) => {
+                const d = thisMonthRecord;
+                d[record.EatingDate] = record;
+                d[record.EatingDate].isModifying = true;
+                onChangeThisMonthRecord(d);
+                onChangeIsLoading(false);
+                closeForm();
             }).catch((error) => {
                 Alert.alert("Error", error.message, [{ text: "Okay" }]);
                 onChangeIsLoading(false);
@@ -169,22 +176,34 @@ export const RecordForm = ({ record, closeForm, backendUrl, dates, onChangeDates
     };
 
     const updateRecord = () => {
-        const record = {
-            name: name,
-            eatingDate: eatingDate,
-            quantity: Number.parseFloat(quantity),
-            satisfactionScore: score,
-            description: desc
+        const newRecord = {
+            Food: { Name: name },
+            EatingDate: eatingDate,
+            EatenQuantity: Number.parseFloat(quantity),
+            SatisfactionScore: score,
+            Description: desc
         };
+        const eatingDateParts = eatingDate.split("-");
+        const year = eatingDateParts[0];
+        const month = eatingDateParts[1];
+        const day = eatingDateParts[2];
         onChangeIsLoading(true);
-        axios.put(`${backendUrl}/records`, record)
-            .then((resp) => {
-                if (resp.status == 200) {
-                    onChangeIsLoading(false);
-                    closeForm();
-                } else {
-                    Alert.alert("Error", resp.data.message, [{ text: "Okay" }]);
-                }
+        fetch(`${backendUrl}/records/${year}/${month}/${day}`, {
+            method: 'PUT',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newRecord)
+        })
+            .then((resp) => resp.json())
+            .then((_) => {
+                const d = thisMonthRecord;
+                d[newRecord.EatingDate] = newRecord;
+                d[newRecord.EatingDate].isModifying = true;
+                onChangeThisMonthRecord(d);
+                onChangeIsLoading(false);
+                closeForm();
             }).catch((error) => {
                 Alert.alert("Error", error.message, [{ text: "Okay" }]);
                 onChangeIsLoading(false);
@@ -206,17 +225,12 @@ export const RecordForm = ({ record, closeForm, backendUrl, dates, onChangeDates
             <Text>Satisfaction Score</Text>
             <SatisfactionScoreDropdown initScore={score} handle={onChangeScore} />
             <Text>Eating Date</Text>
-            <TextInput
-                onChangeText={onChangeEatingDate}
-                value={eatingDate}
-                defaultValue={eatingDate}
-                keyboardType="numeric"
-            />
+            <Text>{eatingDate}</Text>
             <Text>Eaten quantity</Text>
             <TextInput
                 onChangeText={onChangeQuantity}
                 value={quantity}
-                defaultValue={quantity}
+                defaultValue={quantity.toString()}
                 placeholder="How many bags or cans?"
                 keyboardType="numeric"
             />
