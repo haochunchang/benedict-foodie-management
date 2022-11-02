@@ -100,8 +100,8 @@ func (f *FoodRepositoryPSQL) UpdateRecordByDate(year, month, day int64, record R
 	endTime := time.Date(int(year), time.Month(month), int(day+1), 0, 0, 0, 0, time.Local).Add(-time.Second)
 	start := startTime.Format(time.RFC3339)
 	end := endTime.Format(time.RFC3339)
-	f.db.Preload("Food").Where("eating_date BETWEEN ? AND ?", start, end).Find(&oldRecord)
-	return f.db.Model(&oldRecord).Updates(record).Error
+	f.db.Preload("Food").Where("eating_date BETWEEN ? AND ?", start, end).FirstOrCreate(&oldRecord)
+	return f.db.Preload("Food").Model(&oldRecord).Updates(record).Error
 }
 
 func (f *FoodRepositoryPSQL) DeleteRecord(record Record) error {
