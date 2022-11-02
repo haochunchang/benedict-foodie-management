@@ -32,8 +32,8 @@ const FoodCalendar = ({ backendUrl }) => {
                     record={curRecord}
                     closeForm={() => { onChangeCurRecord(defaultRecord) }}
                     backendUrl={backendUrl}
-                    dates={thisMonthRecord}
-                    onChangeDates={onChangeThisMonthRecord}
+                    thisMonthRecord={thisMonthRecord}
+                    onChangeThisMonthRecord={onChangeThisMonthRecord}
                 />
             </Modal>
             <Calendar
@@ -69,16 +69,21 @@ const fetchCurrentMonthRecord = (backendUrl, onChangeThisMonthRecord) => {
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
     let currentRecords = {};
-    axios.get(`${backendUrl}/records/${currentYear}/${currentMonth}`)
-        .then(response => response.data)
+    fetch(`${backendUrl}/records/${currentYear}/${currentMonth}`, {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => response.json())
         .then(result => {
             for (const res of result) {
                 currentRecords[res.EatingDate] = res;
                 currentRecords[res.EatingDate].isModifying = true;
             }
             onChangeThisMonthRecord(currentRecords);
-        })
-        .catch(err => alert(err));
+        }).catch(err => alert(err));
 }
 
 
