@@ -96,7 +96,7 @@ export const FoodForm = ({ closeForm, backendUrl }) => {
 
 export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onChangeThisMonthRecord }) => {
 
-    const eatingDate = record.EatingDate;
+    const eatingDate = record.EatingDate.split("T")[0];
     const [name, onChangeName] = useState(record.FoodName);
     const [quantity, onChangeQuantity] = useState(record.EatenQuantity);
     const [score, onChangeScore] = useState(record.SatisfactionScore);
@@ -125,8 +125,8 @@ export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onC
                     throw data.message;
                 }
                 const d = thisMonthRecord;
-                d[record.EatingDate] = record;
-                d[record.EatingDate].isModifying = true;
+                d[record.EatingDate.split("T")[0]] = record;
+                d[record.EatingDate.split("T")[0]].isModifying = true;
                 onChangeThisMonthRecord(d);
                 onChangeIsLoading(false);
                 closeForm();
@@ -153,12 +153,12 @@ export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onC
         })
             .then((resp) => resp.json())
             .then((data) => {
-                if (data.message != "Food updated") {
+                if (data.message != "Record updated.") {
                     throw data.message;
                 }
                 const d = thisMonthRecord;
-                d[newRecord.EatingDate] = newRecord;
-                d[newRecord.EatingDate].isModifying = true;
+                d[newRecord.EatingDate.split("T")[0]] = newRecord;
+                d[newRecord.EatingDate.split("T")[0]].isModifying = true;
                 onChangeThisMonthRecord(d);
                 onChangeIsLoading(false);
                 closeForm();
@@ -178,7 +178,6 @@ export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onC
                 value={name}
                 defaultValue={name}
                 placeholder="Enter the food name"
-                autoFocus={true}
             />
             <Text>Satisfaction Score</Text>
             <SatisfactionScoreDropdown initScore={score} handle={onChangeScore} />
@@ -191,6 +190,7 @@ export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onC
                 defaultValue={quantity.toString()}
                 placeholder="How many bags or cans?"
                 keyboardType="numeric"
+                autoFocus={true}
             />
             <Text>Food description</Text>
             <TextInput

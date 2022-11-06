@@ -78,8 +78,8 @@ const fetchCurrentMonthRecord = (backendUrl, onChangeThisMonthRecord) => {
         .then(response => response.json())
         .then(result => {
             for (const res of result) {
-                currentRecords[res.EatingDate] = res;
-                currentRecords[res.EatingDate].isModifying = true;
+                currentRecords[res.EatingDate.split("T")[0]] = res;
+                currentRecords[res.EatingDate.split("T")[0]].isModifying = true;
             }
             onChangeThisMonthRecord(currentRecords);
         }).catch(err => alert(err));

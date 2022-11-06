@@ -5,24 +5,34 @@ import (
 	"foodie_manager/db"
 	"io/ioutil"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func CreateRecords(repo db.FoodRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var data []byte
+		var body []byte
 		var err error
+		var data map[string]interface{}
 		var record db.Record
 
-		if data, err = ioutil.ReadAll(c.Request.Body); err != nil {
+		if body, err = ioutil.ReadAll(c.Request.Body); err != nil {
 			c.JSON(400, gin.H{"message": "Error when reading request body."})
 			return
 		}
-		if err = json.Unmarshal(data, &record); err != nil {
+		if err = json.Unmarshal(body, &data); err != nil {
 			c.JSON(400, gin.H{"message": "Error when parsing request body."})
 			return
 		}
+
+		if record.EatingDate, err = time.ParseInLocation("2006-01-02", data["EatingDate"].(string), time.Local); err != nil {
+			c.JSON(400, gin.H{"message": "Error when parsing request body."})
+			return
+		}
+		record.EatenQuantity = data["EatenQuantity"].(float64)
+		record.FoodName = data["FoodName"].(string)
+		record.SatisfactionScore = uint(data["SatisfactionScore"].(float64))
 
 		if err = repo.CreateRecord(record); err != nil {
 			c.JSON(500, gin.H{"message": "Something error when creating record."})
@@ -76,16 +86,25 @@ func UpdateRecordsByDate(repo db.FoodRepository) gin.HandlerFunc {
 		}
 
 		// Parse new record in request body
-		var data []byte
+		var body []byte
+		var data map[string]interface{}
 		var record db.Record
-		if data, err = ioutil.ReadAll(c.Request.Body); err != nil {
+		if body, err = ioutil.ReadAll(c.Request.Body); err != nil {
 			c.JSON(400, gin.H{"message": "Error when reading request body."})
 			return
 		}
-		if err = json.Unmarshal(data, &record); err != nil {
+		if err = json.Unmarshal(body, &data); err != nil {
 			c.JSON(400, gin.H{"message": "Error when parsing request body."})
 			return
 		}
+
+		if record.EatingDate, err = time.ParseInLocation("2006-01-02", data["EatingDate"].(string), time.Local); err != nil {
+			c.JSON(400, gin.H{"message": "Error when parsing request body."})
+			return
+		}
+		record.EatenQuantity = data["EatenQuantity"].(float64)
+		record.FoodName = data["FoodName"].(string)
+		record.SatisfactionScore = uint(data["SatisfactionScore"].(float64))
 
 		oldRecord, err := repo.GetRecordsByDate(year, month, day)
 		if len(oldRecord) == 0 || err != nil {

@@ -8,33 +8,32 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-func getSampleRecords() []db.Record {
-	return []db.Record{
+func getSampleRecords() []map[string]interface{} {
+	return []map[string]interface{}{
 		{
-			FoodName:          "hororo",
-			Description:       "",
-			EatingDate:        time.Date(2022, 10, 22, 0, 0, 1, 0, time.Local),
-			EatenQuantity:     0.5,
-			SatisfactionScore: 3,
+			"FoodName":          "hororo",
+			"Description":       "",
+			"EatingDate":        "2022-10-22",
+			"EatenQuantity":     0.5,
+			"SatisfactionScore": 3,
 		},
 		{
-			FoodName:          "hororo",
-			Description:       "",
-			EatingDate:        time.Date(2022, 10, 23, 0, 0, 1, 0, time.Local),
-			EatenQuantity:     0.5,
-			SatisfactionScore: 5,
+			"FoodName":          "hororo",
+			"Description":       "",
+			"EatingDate":        "2022-10-23",
+			"EatenQuantity":     0.5,
+			"SatisfactionScore": 5,
 		},
 		{
-			FoodName:          "hororo",
-			Description:       "",
-			EatingDate:        time.Date(2022, 10, 24, 0, 0, 1, 0, time.Local),
-			EatenQuantity:     0.5,
-			SatisfactionScore: 2,
+			"FoodName":          "hororo",
+			"Description":       "",
+			"EatingDate":        "2022-10-24",
+			"EatenQuantity":     0.5,
+			"SatisfactionScore": 2,
 		},
 	}
 }
@@ -137,7 +136,7 @@ func TestUpdateRecordByDateRoute(t *testing.T) {
 
 	// Test update record
 	w := httptest.NewRecorder()
-	record.EatenQuantity = 5.0
+	record["EatenQuantity"] = 5.0
 	json_data, _ = json.Marshal(record)
 	req, _ = http.NewRequest("PUT", fmt.Sprintf("/records/%d/%d/%d", 2022, 10, 22), bytes.NewBuffer(json_data))
 	router.ServeHTTP(w, req)
