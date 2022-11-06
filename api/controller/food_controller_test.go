@@ -14,11 +14,9 @@ import (
 
 func getSampleFood() db.Food {
 	food := db.Food{
-		Name:            "hororo",
-		Type:            "wet",
-		PurchaseDate:    "2022-10-22T00:00:00+08:00",
-		CurrentQuantity: 24,
-		Description:     "A kind of can food",
+		Name:        "hororo",
+		Type:        "wet",
+		Description: "A kind of can food",
 	}
 	return food
 }
@@ -46,13 +44,9 @@ func TestGetFoodbyNameRoute(t *testing.T) {
 	router := SetupFoodControllers(gin.Default(), repo)
 
 	food := getSampleFood()
-	json_data, _ := json.Marshal(food)
-
-	req, _ := http.NewRequest("POST", "/foods", bytes.NewBuffer(json_data))
-	router.ServeHTTP(httptest.NewRecorder(), req)
 
 	w := httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/foods/hororo", nil)
+	req, _ := http.NewRequest("GET", "/foods/hororo", nil)
 	router.ServeHTTP(w, req)
 
 	if w.Code != 200 {
@@ -69,12 +63,6 @@ func TestGetFoodbyNameRoute(t *testing.T) {
 	if resp.Type != food.Type {
 		t.Errorf("Food Type not correct\nExpected %s, got %s", food.Type, resp.Type)
 	}
-	if resp.PurchaseDate != food.PurchaseDate {
-		t.Errorf("Food PurchaseDate not correct\nExpected %s, got %s", food.PurchaseDate, resp.PurchaseDate)
-	}
-	if resp.CurrentQuantity != food.CurrentQuantity {
-		t.Errorf("Food CurrentQuantity not correct\nExpected %f, got %f", food.CurrentQuantity, resp.CurrentQuantity)
-	}
 	if resp.Description != food.Description {
 		t.Errorf("Food Description not correct\nExpected %s, got %s", food.Description, resp.Description)
 	}
@@ -82,9 +70,8 @@ func TestGetFoodbyNameRoute(t *testing.T) {
 
 func TestUpdateFoodByNameRoute(t *testing.T) {
 	router := SetupFoodControllers(gin.Default(), repo)
-
-	// POST sample food
 	food := getSampleFood()
+	food.Name = "baily"
 	json_data, _ := json.Marshal(food)
 	req, _ := http.NewRequest("POST", "/foods", bytes.NewBuffer(json_data))
 	router.ServeHTTP(httptest.NewRecorder(), req)
@@ -94,21 +81,21 @@ func TestUpdateFoodByNameRoute(t *testing.T) {
 	json_data, _ = json.Marshal(food)
 
 	w := httptest.NewRecorder()
-	req, _ = http.NewRequest("PUT", "/foods?oldFoodName=hororo", bytes.NewBuffer(json_data))
+	req, _ = http.NewRequest("PUT", "/foods?oldFoodName=baily", bytes.NewBuffer(json_data))
 	router.ServeHTTP(w, req)
 	if w.Code != 200 {
 		t.Errorf("Status code not 200, got %d", w.Code)
 	}
-	if w.Body.String() != fmt.Sprintf(`{"message":"Food %s updated to %s"}`, "hororo", "hihi") {
+	if w.Body.String() != fmt.Sprintf(`{"message":"Food %s updated to %s"}`, "baily", "hihi") {
 		t.Errorf("Food name not updated, got %s", w.Body.String())
 	}
 
-	// w = httptest.NewRecorder()
-	// req, _ = http.NewRequest("GET", "/foods/hororo", nil)
-	// router.ServeHTTP(w, req)
-	// if w.Code != 200 || w.Body.String() != `"message": "Food not found."` {
-	// 	t.Errorf("Get by old name should not be found, got %s", w.Body.String())
-	// }
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/foods/baily", nil)
+	router.ServeHTTP(w, req)
+	if w.Code == 200 {
+		t.Errorf("Get by old name should not be found, got %s", w.Body.String())
+	}
 
 	// Get new name should get data
 	w = httptest.NewRecorder()

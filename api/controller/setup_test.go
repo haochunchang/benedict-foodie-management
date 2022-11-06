@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -20,6 +21,7 @@ var repo *db.FoodRepositoryPSQL = db.NewFoodRepositoryPSQL(conn)
 func TestMain(m *testing.M) {
 	repo.Clear()
 	repo.Init()
+	gin.SetMode(gin.ReleaseMode)
 
 	code := m.Run()
 

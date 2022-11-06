@@ -15,21 +15,21 @@ import (
 func getSampleRecords() []db.Record {
 	return []db.Record{
 		{
-			Food:              db.Food{Name: "hororo"},
+			FoodName:          "hororo",
 			Description:       "",
 			EatingDate:        "2022-10-22T00:00:00+08:00",
 			EatenQuantity:     0.5,
 			SatisfactionScore: 3,
 		},
 		{
-			Food:              db.Food{Name: "hororo"},
+			FoodName:          "hororo",
 			Description:       "",
 			EatingDate:        "2022-10-23T00:00:00+08:00",
 			EatenQuantity:     0.5,
 			SatisfactionScore: 5,
 		},
 		{
-			Food:              db.Food{Name: "hororo"},
+			FoodName:          "hororo",
 			Description:       "",
 			EatingDate:        "2022-10-24T00:00:00+08:00",
 			EatenQuantity:     0.5,
@@ -41,16 +41,11 @@ func getSampleRecords() []db.Record {
 func TestCreateRecordRoute(t *testing.T) {
 	router := SetupRecordControllers(gin.Default(), repo)
 
-	food := getSampleFood()
-	json_data, _ := json.Marshal(food)
-	req, _ := http.NewRequest("POST", "/foods", bytes.NewBuffer(json_data))
-	router.ServeHTTP(httptest.NewRecorder(), req)
-
 	record := getSampleRecords()[0]
-	json_data, _ = json.Marshal(record)
+	json_data, _ := json.Marshal(record)
 
 	w := httptest.NewRecorder()
-	req, _ = http.NewRequest("POST", "/records", bytes.NewBuffer(json_data))
+	req, _ := http.NewRequest("POST", "/records", bytes.NewBuffer(json_data))
 	router.ServeHTTP(w, req)
 
 	if w.Code != 201 {

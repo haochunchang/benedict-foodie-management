@@ -38,9 +38,9 @@ func CreateFood(repo db.FoodRepository) gin.HandlerFunc {
 func GetFoodByName(repo db.FoodRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name := c.Param("name")
-		food := repo.GetFoodByName(name)
-		if len(food.PurchaseDate) == 0 {
-			c.JSON(400, gin.H{"message": "Food not found."})
+		food, err := repo.GetFoodByName(name)
+		if err != nil {
+			c.JSON(500, gin.H{"message": "Error occurred when getting food."})
 			return
 		}
 		c.JSON(200, food)
