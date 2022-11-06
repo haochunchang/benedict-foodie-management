@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useState } from 'react';
 import {
     View, Text, TextInput, Button, Alert,
@@ -12,6 +11,11 @@ const SatisfactionScoreDescription = {
     4: "Eating eagerly",
     5: "Eating eagerly with talking",
 }
+
+const HEADERS = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+};
 
 const FoodTypeDropdownList = ({ handle }) => {
     return (
@@ -36,14 +40,6 @@ const SatisfactionScoreDropdown = ({ initScore, handle }) => {
 };
 
 export const FoodForm = ({ closeHandle, backendUrl }) => {
-    /**
-     * FoodForm consists of
-     *  - Name
-     *  - Type
-     *  - PurchaseDate (default: today's date)
-     *  - CurrentQuantity
-     *  - Description
-     */
     const [name, onChangeName] = useState("");
     const [type, onChangeType] = useState("");
     const [quantity, onChangeQuantity] = useState(0);
@@ -63,10 +59,7 @@ export const FoodForm = ({ closeHandle, backendUrl }) => {
         onChangeIsLoading(true);
         fetch(`${backendUrl}/foods`, {
             method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json'
-            },
+            headers: HEADERS,
             body: JSON.stringify(food)
         })
             .then((resp) => resp.json())
@@ -118,23 +111,7 @@ export const FoodForm = ({ closeHandle, backendUrl }) => {
 }
 
 export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onChangeThisMonthRecord }) => {
-    /**
-     * RecordForm consists of
-     *  - Food name
-     *  - Eating Date
-     *  - Eaten Quantity
-     *  - Satisfaction Score
-     *  - Description
-     *  - PhotoURL
-     */
-    if (record === undefined) {
-        record = {
-            Name: "",
-            EatenQuantity: 0,
-            SatisfactionScore: 0,
-            Description: "",
-        };
-    }
+
     const eatingDate = record.EatingDate;
     const [name, onChangeName] = useState(record.Food.Name);
     const [quantity, onChangeQuantity] = useState(record.EatenQuantity);
@@ -155,10 +132,7 @@ export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onC
         onChangeIsLoading(true);
         fetch(`${backendUrl}/records`, {
             method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json'
-            },
+            headers: HEADERS,
             body: JSON.stringify(record)
         })
             .then((resp) => resp.json())
@@ -183,17 +157,11 @@ export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onC
             SatisfactionScore: score,
             Description: desc
         };
-        const eatingDateParts = eatingDate.split("-");
-        const year = eatingDateParts[0];
-        const month = eatingDateParts[1];
-        const day = eatingDateParts[2];
+        const [year, month, day] = eatingDate.split("-");
         onChangeIsLoading(true);
         fetch(`${backendUrl}/records/${year}/${month}/${day}`, {
             method: 'PUT',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json'
-            },
+            headers: HEADERS,
             body: JSON.stringify(newRecord)
         })
             .then((resp) => resp.json())
