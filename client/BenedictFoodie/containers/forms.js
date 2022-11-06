@@ -39,22 +39,17 @@ const SatisfactionScoreDropdown = ({ initScore, handle }) => {
     );
 };
 
-export const FoodForm = ({ closeHandle, backendUrl }) => {
+export const FoodForm = ({ closeForm, backendUrl }) => {
     const [name, onChangeName] = useState("");
     const [type, onChangeType] = useState("");
-    const [quantity, onChangeQuantity] = useState(0);
     const [desc, onChangeDesc] = useState("");
     const [isLoading, onChangeIsLoading] = useState(false);
-    const now = new Date();
-    const [purchaseDate, onChangePurchaseDate] = useState(`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`);
 
     const submitFoodForm = () => {
         const food = {
             Name: name,
             Type: type,
-            PurchaseDate: purchaseDate,
             Description: desc,
-            Quantity: quantity,
         };
         onChangeIsLoading(true);
         fetch(`${backendUrl}/foods`, {
@@ -63,11 +58,14 @@ export const FoodForm = ({ closeHandle, backendUrl }) => {
             body: JSON.stringify(food)
         })
             .then((resp) => resp.json())
-            .then((_) => {
+            .then((data) => {
+                if (data.message != "Food created") {
+                    throw data.message;
+                }
                 onChangeIsLoading(false);
-                closeHandle();
+                closeForm();
             }).catch((error) => {
-                Alert.alert("Error", error.message, [{ text: "Okay" }]);
+                Alert.alert("Error", error, [{ text: "Okay" }]);
                 onChangeIsLoading(false);
             });
     }
@@ -84,20 +82,6 @@ export const FoodForm = ({ closeHandle, backendUrl }) => {
             />
             <Text>Food type</Text>
             <FoodTypeDropdownList handle={onChangeType} />
-            <Text>Purchase Date</Text>
-            <TextInput
-                onChangeText={onChangePurchaseDate}
-                value={purchaseDate}
-                placeholder="Enter the purchase date in YYYY-MM-DD format"
-                keyboardType="numeric"
-            />
-            <Text>Food quantity</Text>
-            <TextInput
-                onChangeText={onChangeQuantity}
-                value={quantity}
-                placeholder="Enter the number of bags or cans"
-                keyboardType="phone-pad"
-            />
             <Text>Food description</Text>
             <TextInput
                 onChangeText={onChangeDesc}
@@ -105,7 +89,7 @@ export const FoodForm = ({ closeHandle, backendUrl }) => {
                 placeholder="What's about the food?"
             />
             <Button title="Submit" onPress={submitFoodForm} disabled={isLoading} />
-            <Button title="Cancel" onPress={closeHandle} />
+            <Button title="Cancel" onPress={closeForm} />
         </View>
     )
 }

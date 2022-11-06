@@ -85,7 +85,7 @@ const App = () => {
             accessibilityLabel="This button is used to add food"
           />
           <Modal visible={isCreatingFood}>
-            <FoodForm closeHandle={onChangeIsCreatingFood} backendUrl={backendUrl} />
+            <FoodForm closeForm={() => onChangeIsCreatingFood(false)} backendUrl={backendUrl} />
           </Modal>
           <Section title="Food Calendar">
             <FoodCalendar
