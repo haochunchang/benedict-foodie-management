@@ -7,7 +7,7 @@ import { RecordForm } from './forms';
 const FoodCalendar = ({ backendUrl }) => {
 
     const defaultRecord = {
-        Name: "",
+        FoodName: "",
         EatingDate: "",
         EatenQuantity: 0,
         SatisfactionScore: 0,
@@ -41,7 +41,7 @@ const FoodCalendar = ({ backendUrl }) => {
                         onChangeCurRecord(thisMonthRecord[dateString])
                     } else {
                         onChangeCurRecord({
-                            Name: "",
+                            FoodName: "",
                             EatingDate: dateString,
                             EatenQuantity: 0,
                             SatisfactionScore: 0,

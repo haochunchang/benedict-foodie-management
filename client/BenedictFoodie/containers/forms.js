@@ -97,7 +97,7 @@ export const FoodForm = ({ closeForm, backendUrl }) => {
 export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onChangeThisMonthRecord }) => {
 
     const eatingDate = record.EatingDate;
-    const [name, onChangeName] = useState(record.Food.Name);
+    const [name, onChangeName] = useState(record.FoodName);
     const [quantity, onChangeQuantity] = useState(record.EatenQuantity);
     const [score, onChangeScore] = useState(record.SatisfactionScore);
     const [desc, onChangeDesc] = useState(record.Description);
@@ -107,7 +107,7 @@ export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onC
 
     const submitRecord = () => {
         const record = {
-            Food: { Name: name },
+            FoodName: name,
             EatingDate: eatingDate,
             EatenQuantity: Number.parseFloat(quantity),
             SatisfactionScore: score,
@@ -120,7 +120,10 @@ export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onC
             body: JSON.stringify(record)
         })
             .then((resp) => resp.json())
-            .then((_) => {
+            .then((data) => {
+                if (data.message != "Record created") {
+                    throw data.message;
+                }
                 const d = thisMonthRecord;
                 d[record.EatingDate] = record;
                 d[record.EatingDate].isModifying = true;
@@ -128,14 +131,14 @@ export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onC
                 onChangeIsLoading(false);
                 closeForm();
             }).catch((error) => {
-                Alert.alert("Error", error.message, [{ text: "Okay" }]);
+                Alert.alert("Error", error, [{ text: "Okay" }]);
                 onChangeIsLoading(false);
             });
     };
 
     const updateRecord = () => {
         const newRecord = {
-            Food: { Name: name },
+            FoodName: name,
             EatingDate: eatingDate,
             EatenQuantity: Number.parseFloat(quantity),
             SatisfactionScore: score,
@@ -149,7 +152,10 @@ export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onC
             body: JSON.stringify(newRecord)
         })
             .then((resp) => resp.json())
-            .then((_) => {
+            .then((data) => {
+                if (data.message != "Food updated") {
+                    throw data.message;
+                }
                 const d = thisMonthRecord;
                 d[newRecord.EatingDate] = newRecord;
                 d[newRecord.EatingDate].isModifying = true;
@@ -157,7 +163,7 @@ export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onC
                 onChangeIsLoading(false);
                 closeForm();
             }).catch((error) => {
-                Alert.alert("Error", error.message, [{ text: "Okay" }]);
+                Alert.alert("Error", error, [{ text: "Okay" }]);
                 onChangeIsLoading(false);
             });
     }
