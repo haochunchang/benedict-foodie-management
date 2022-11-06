@@ -25,7 +25,7 @@ type Repository interface {
 type FoodRepository interface {
 	Repository
 	CreateFood(Food) error
-	GetFoodByName(string) Food
+	GetFoodByName(string) (Food, error)
 	UpdateFoodByName(string, Food) error
 	DeleteFood(Food) error
 	CreateRecord(Record) error
@@ -48,18 +48,17 @@ func (f *FoodRepositoryPSQL) Init() {
 }
 
 func (f *FoodRepositoryPSQL) Clear() {
-	f.db.Exec("DROP TABLE IF EXISTS foods")
 	f.db.Exec("DROP TABLE IF EXISTS records")
+	f.db.Exec("DROP TABLE IF EXISTS foods")
 }
 
 func (f *FoodRepositoryPSQL) CreateFood(food Food) error {
 	return f.db.Create(&food).Error
 }
 
-func (f *FoodRepositoryPSQL) GetFoodByName(name string) Food {
-	var result Food
-	f.db.Where("name = ?", name).Find(&result)
-	return result
+func (f *FoodRepositoryPSQL) GetFoodByName(name string) (result Food, err error) {
+	err = f.db.Where("name = ?", name).Last(&result).Error
+	return
 }
 
 func (f *FoodRepositoryPSQL) UpdateFoodByName(name string, food Food) error {
@@ -75,7 +74,11 @@ func (f *FoodRepositoryPSQL) DeleteFood(food Food) error {
 }
 
 func (f *FoodRepositoryPSQL) CreateRecord(r Record) error {
-	return f.db.Create(&r).Error
+	var food Food
+	if err := f.db.Where("name = ?", r.FoodName).First(&food).Error; err != nil {
+		return err
+	}
+	return f.db.Model(&food).Association("Records").Append(&r)
 }
 
 func (f *FoodRepositoryPSQL) GetRecordsByDate(year, month, day int64) ([]Record, error) {
@@ -90,7 +93,7 @@ func (f *FoodRepositoryPSQL) GetRecordsByDate(year, month, day int64) ([]Record,
 	}
 	start := startTime.Format(time.RFC3339)
 	end := endTime.Format(time.RFC3339)
-	f.db.Preload("Food").Where("eating_date BETWEEN ? AND ?", start, end).Find(&results)
+	f.db.Where("eating_date BETWEEN ? AND ?", start, end).Order("updated_at").Find(&results)
 	return results, nil
 }
 
@@ -100,8 +103,13 @@ func (f *FoodRepositoryPSQL) UpdateRecordByDate(year, month, day int64, record R
 	endTime := time.Date(int(year), time.Month(month), int(day+1), 0, 0, 0, 0, time.Local).Add(-time.Second)
 	start := startTime.Format(time.RFC3339)
 	end := endTime.Format(time.RFC3339)
-	f.db.Preload("Food").Where("eating_date BETWEEN ? AND ?", start, end).FirstOrCreate(&oldRecord)
-	return f.db.Preload("Food").Model(&oldRecord).Updates(record).Error
+	f.db.Where("eating_date BETWEEN ? AND ?", start, end).Find(&oldRecord)
+
+	var food Food
+	if err := f.db.Where("name = ?", oldRecord.FoodName).First(&food).Error; err != nil {
+		return err
+	}
+	return f.db.Model(&food).Association("Records").Replace(&record, &oldRecord)
 }
 
 func (f *FoodRepositoryPSQL) DeleteRecord(record Record) error {

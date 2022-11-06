@@ -4,20 +4,18 @@ import (
 	"gorm.io/gorm"
 )
 
+// A food has many eating Record.
 type Food struct {
 	gorm.Model
-	Name            string
-	Type            string
-	PurchaseDate    string // RFC3339
-	CurrentQuantity float64
-	Description     string
-	RecordID        uint
+	Name        string `gorm:"unique"`
+	Type        string
+	Description string
+	Records     []Record `gorm:"foreignKey:FoodName;references:Name;constraint:OnUpdate:CASCADE;"`
 }
 
-// A record has one food
 type Record struct {
 	gorm.Model
-	Food              Food
+	FoodName          string
 	Description       string
 	EatingDate        string // RFC3339
 	EatenQuantity     float64
