@@ -2,9 +2,9 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"foodie_manager/db"
 	"io/ioutil"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,6 +26,10 @@ func CreateFood(repo db.FoodRepository) gin.HandlerFunc {
 		}
 
 		if err = repo.CreateFood(food); err != nil {
+			if strings.Contains(err.Error(), "duplicate key value") {
+				c.JSON(400, gin.H{"message": "Food name already exist."})
+				return
+			}
 			c.JSON(500, gin.H{"message": "Something error when creating food."})
 			return
 		}
@@ -66,9 +70,7 @@ func UpdateFoodByName(repo db.FoodRepository) gin.HandlerFunc {
 			c.JSON(500, gin.H{"message": "Something error when updating food."})
 			return
 		}
-		c.JSON(200, gin.H{
-			"message": fmt.Sprintf("Food %s updated to %s", name, food.Name),
-		})
+		c.JSON(200, gin.H{"message": "Food updated"})
 	}
 }
 

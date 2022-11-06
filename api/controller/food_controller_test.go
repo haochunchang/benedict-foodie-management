@@ -86,7 +86,7 @@ func TestUpdateFoodByNameRoute(t *testing.T) {
 	if w.Code != 200 {
 		t.Errorf("Status code not 200, got %d", w.Code)
 	}
-	if w.Body.String() != fmt.Sprintf(`{"message":"Food %s updated to %s"}`, "baily", "hihi") {
+	if w.Body.String() != `{"message":"Food updated"}` {
 		t.Errorf("Food name not updated, got %s", w.Body.String())
 	}
 
