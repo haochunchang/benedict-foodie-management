@@ -43,7 +43,7 @@ func TestGetFood(t *testing.T) {
 }
 
 func TestGetRecordByDate(t *testing.T) {
-	date := time.Date(2022, 10, 31, 0, 0, 1, 0, time.Local).Format(time.RFC3339)
+	date := time.Date(2022, 10, 31, 0, 0, 1, 0, time.Local)
 	food := Food{Name: "hororo", Type: "wet"}
 
 	target := Record{
@@ -97,7 +97,7 @@ func TestUpdateFoodByName(t *testing.T) {
 }
 
 func TestUpdateRecordByDate(t *testing.T) {
-	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
+	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local)
 	food := Food{Name: "hororo", Type: "wet"}
 
 	target := Record{
@@ -110,7 +110,7 @@ func TestUpdateRecordByDate(t *testing.T) {
 
 	newRecord := target
 	newRecord.EatenQuantity = 10
-	if err := repo.UpdateRecordByDate(2022, 10, 21, newRecord); err != nil {
+	if err := repo.UpdateRecord(target, newRecord); err != nil {
 		t.Errorf("Failed to update record, got %v", err)
 	}
 
@@ -118,13 +118,13 @@ func TestUpdateRecordByDate(t *testing.T) {
 	if err != nil {
 		t.Errorf("Failed to get record, got %v", err)
 	}
-	if len(resp) != 2 || resp[1].EatenQuantity != 10 {
-		t.Errorf("Incorrect updated record, got %v", resp[1])
+	if resp[len(resp)-1].EatenQuantity != 10 {
+		t.Errorf("Incorrect updated record, got %v", resp)
 	}
 }
 
 func TestDeleteRecord(t *testing.T) {
-	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local).Format(time.RFC3339)
+	date := time.Date(2022, 10, 21, 0, 0, 0, 0, time.Local)
 	food := Food{Name: "hororo", Type: "wet"}
 
 	target := Record{

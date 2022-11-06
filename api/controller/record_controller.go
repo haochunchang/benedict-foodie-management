@@ -87,7 +87,12 @@ func UpdateRecordsByDate(repo db.FoodRepository) gin.HandlerFunc {
 			return
 		}
 
-		if err = repo.UpdateRecordByDate(year, month, day, record); err != nil {
+		oldRecord, err := repo.GetRecordsByDate(year, month, day)
+		if len(oldRecord) == 0 || err != nil {
+			c.JSON(400, gin.H{"message": "Record not found."})
+			return
+		}
+		if err = repo.UpdateRecord(oldRecord[0], record); err != nil {
 			c.JSON(500, gin.H{"message": "Service unavailable."})
 			return
 		}

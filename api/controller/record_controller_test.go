@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,21 +18,21 @@ func getSampleRecords() []db.Record {
 		{
 			FoodName:          "hororo",
 			Description:       "",
-			EatingDate:        "2022-10-22T00:00:00+08:00",
+			EatingDate:        time.Date(2022, 10, 22, 0, 0, 1, 0, time.Local),
 			EatenQuantity:     0.5,
 			SatisfactionScore: 3,
 		},
 		{
 			FoodName:          "hororo",
 			Description:       "",
-			EatingDate:        "2022-10-23T00:00:00+08:00",
+			EatingDate:        time.Date(2022, 10, 23, 0, 0, 1, 0, time.Local),
 			EatenQuantity:     0.5,
 			SatisfactionScore: 5,
 		},
 		{
 			FoodName:          "hororo",
 			Description:       "",
-			EatingDate:        "2022-10-24T00:00:00+08:00",
+			EatingDate:        time.Date(2022, 10, 24, 0, 0, 1, 0, time.Local),
 			EatenQuantity:     0.5,
 			SatisfactionScore: 2,
 		},

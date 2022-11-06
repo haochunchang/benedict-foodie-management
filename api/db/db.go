@@ -30,7 +30,7 @@ type FoodRepository interface {
 	DeleteFood(Food) error
 	CreateRecord(Record) error
 	GetRecordsByDate(int64, int64, int64) ([]Record, error)
-	UpdateRecordByDate(int64, int64, int64, Record) error
+	UpdateRecord(Record, Record) error
 	DeleteRecord(Record) error
 }
 
@@ -91,25 +91,16 @@ func (f *FoodRepositoryPSQL) GetRecordsByDate(year, month, day int64) ([]Record,
 		startTime = time.Date(int(year), time.Month(month), 1, 0, 0, 0, 0, time.Local)
 		endTime = time.Date(int(year), time.Month(month+1), 1, 0, 0, 0, 0, time.Local).Add(-time.Second)
 	}
-	start := startTime.Format(time.RFC3339)
-	end := endTime.Format(time.RFC3339)
-	f.db.Where("eating_date BETWEEN ? AND ?", start, end).Order("updated_at").Find(&results)
+	f.db.Where("eating_date BETWEEN ? AND ?", startTime, endTime).Order("updated_at").Find(&results)
 	return results, nil
 }
 
-func (f *FoodRepositoryPSQL) UpdateRecordByDate(year, month, day int64, record Record) error {
-	var oldRecord Record
-	startTime := time.Date(int(year), time.Month(month), int(day), 0, 0, 0, 0, time.Local)
-	endTime := time.Date(int(year), time.Month(month), int(day+1), 0, 0, 0, 0, time.Local).Add(-time.Second)
-	start := startTime.Format(time.RFC3339)
-	end := endTime.Format(time.RFC3339)
-	f.db.Where("eating_date BETWEEN ? AND ?", start, end).Find(&oldRecord)
-
+func (f *FoodRepositoryPSQL) UpdateRecord(oldRecord, record Record) error {
 	var food Food
 	if err := f.db.Where("name = ?", oldRecord.FoodName).First(&food).Error; err != nil {
 		return err
 	}
-	return f.db.Model(&food).Association("Records").Replace(&record, &oldRecord)
+	return f.db.Model(&food).Association("Records").Replace(&oldRecord, &record)
 }
 
 func (f *FoodRepositoryPSQL) DeleteRecord(record Record) error {

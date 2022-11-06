@@ -1,6 +1,8 @@
 package db
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -17,7 +19,7 @@ type Record struct {
 	gorm.Model
 	FoodName          string
 	Description       string
-	EatingDate        string // RFC3339
+	EatingDate        time.Time
 	EatenQuantity     float64
 	SatisfactionScore uint
 	PhotoURL          string
