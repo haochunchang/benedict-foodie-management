@@ -43,8 +43,7 @@ func NewFoodRepositoryPSQL(conn *gorm.DB) *FoodRepositoryPSQL {
 }
 
 func (f *FoodRepositoryPSQL) Init() {
-	f.db.AutoMigrate(&Food{})
-	f.db.AutoMigrate(&Record{})
+	f.db.AutoMigrate(&Food{}, &Record{})
 }
 
 func (f *FoodRepositoryPSQL) Clear() {
