@@ -88,7 +88,7 @@ const fetchCurrentMonthRecord = (backendUrl, onChangeThisMonthRecord) => {
 
 const getMarkedDates = (records) => {
     let marked = {};
-    for (r in records) {
+    for (const r in records) {
         marked[r] = { marked: true, selectedColor: 'blue' };
     }
     return marked;
