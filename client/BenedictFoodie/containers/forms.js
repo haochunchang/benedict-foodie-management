@@ -65,8 +65,11 @@ export const FoodForm = ({ closeForm, backendUrl }) => {
                 onChangeIsLoading(false);
                 closeForm();
             }).catch((error) => {
-                Alert.alert("Error", error, [{ text: "Okay" }]);
-                onChangeIsLoading(false);
+                if (typeof error === "object" && error !== null) {
+                    Alert.alert("Error", error.message, [{ text: "Okay" }]);
+                } else {
+                    Alert.alert("Error", error, [{ text: "Okay" }]);
+                }
             });
     }
 
@@ -131,7 +134,11 @@ export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onC
                 onChangeIsLoading(false);
                 closeForm();
             }).catch((error) => {
-                Alert.alert("Error", error, [{ text: "Okay" }]);
+                if (typeof error === "object" && error !== null) {
+                    Alert.alert("Error", error.message, [{ text: "Okay" }]);
+                } else {
+                    Alert.alert("Error", error, [{ text: "Okay" }]);
+                }
                 onChangeIsLoading(false);
             });
     };
@@ -163,8 +170,11 @@ export const RecordForm = ({ record, closeForm, backendUrl, thisMonthRecord, onC
                 onChangeIsLoading(false);
                 closeForm();
             }).catch((error) => {
-                Alert.alert("Error", error, [{ text: "Okay" }]);
-                onChangeIsLoading(false);
+                if (typeof error === "object" && error !== null) {
+                    Alert.alert("Error", error.message, [{ text: "Okay" }]);
+                } else {
+                    Alert.alert("Error", error, [{ text: "Okay" }]);
+                }
             });
     }
 
