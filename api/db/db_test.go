@@ -104,9 +104,6 @@ func TestUpdateRecordByDate(t *testing.T) {
 		FoodName:   food.Name,
 		EatingDate: date,
 	}
-	if err := repo.CreateRecord(target); err != nil {
-		t.Fatalf("Failed to create record: %v", err)
-	}
 
 	newRecord := target
 	newRecord.EatenQuantity = 10
@@ -118,7 +115,7 @@ func TestUpdateRecordByDate(t *testing.T) {
 	if err != nil {
 		t.Errorf("Failed to get record, got %v", err)
 	}
-	if resp[len(resp)-1].EatenQuantity != 10 {
+	if resp[0].EatenQuantity != 10 {
 		t.Errorf("Incorrect updated record, got %v", resp)
 	}
 }

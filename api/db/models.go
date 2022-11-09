@@ -16,7 +16,8 @@ type Food struct {
 }
 
 type Record struct {
-	gorm.Model
+	// gorm.Model
+	ID                uint
 	FoodName          string
 	Description       string
 	EatingDate        time.Time

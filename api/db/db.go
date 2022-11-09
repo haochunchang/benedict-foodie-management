@@ -90,16 +90,18 @@ func (f *FoodRepositoryPSQL) GetRecordsByDate(year, month, day int64) ([]Record,
 		startTime = time.Date(int(year), time.Month(month), 1, 0, 0, 0, 0, time.Local)
 		endTime = time.Date(int(year), time.Month(month+1), 1, 0, 0, 0, 0, time.Local).Add(-time.Second)
 	}
-	f.db.Where("eating_date BETWEEN ? AND ?", startTime, endTime).Order("updated_at").Find(&results)
+	f.db.Where("eating_date BETWEEN ? AND ?", startTime, endTime).Find(&results)
 	return results, nil
 }
 
 func (f *FoodRepositoryPSQL) UpdateRecord(oldRecord, record Record) error {
-	var food Food
-	if err := f.db.Where("name = ?", oldRecord.FoodName).First(&food).Error; err != nil {
-		return err
-	}
-	return f.db.Model(&food).Association("Records").Replace(&oldRecord, &record)
+	tx := f.db.Model(&oldRecord)
+	tx = tx.Where("food_name", oldRecord.FoodName)
+	tx = tx.Where("eaten_quantity", oldRecord.EatenQuantity)
+	tx = tx.Where("description", oldRecord.Description)
+	tx = tx.Where("satisfaction_score", oldRecord.SatisfactionScore)
+	tx = tx.Where("photo_url", oldRecord.PhotoURL)
+	return tx.Updates(&record).Error
 }
 
 func (f *FoodRepositoryPSQL) DeleteRecord(record Record) error {
